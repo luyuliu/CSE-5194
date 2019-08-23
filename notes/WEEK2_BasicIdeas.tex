@@ -1,5 +1,9 @@
 \documentclass[12pt]{article}
 \begin{document}
+
+\newcounter{para}
+\newcommand\para{\par\refstepcounter{para}\thepara\space}
+
 \section*{CSE 5194 WEEK2 - Basic idea}
     \title{CSE 5194 WEEK2 - Basic idea}
     \paragraph{Feature}
@@ -35,6 +39,29 @@
     The single node is a perceptron
     Multiple layers are a MLP.
     Any deep neural network is a MLP.
+    \paragraph{Activation function and back-propagation}
+    you don't have to learn for pragmatic purposes.
+\paragraph{SGD}
+GOAL: MNIMIZE A COST FN. $J(\theta)$ AS A FUNCTION OF $\theta$
+\\ 
+\\SGD is iterative;
+\\Basically it is a optimization process.
 
-    
+\subparagraph{learning rate}
+Learning speed: too high or too low
+
+\paragraph{Batch size}
+mINI-BATCH: batch size between N and 1
+Find the optimal batch size will yield the fast learning process.
+It's pretty much an empirical process. By guess.
+
+The batch size is a hyperparameter that defines the number of samples to work through before updating the internal model parameters.
+
+\subparagraph{epoch}
+epoch is a process of going through all N data.
+
+\paragraph{Accuracy and speed}
+throughput is speed
+
+
 \end{document}
