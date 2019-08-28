@@ -1,0 +1,77 @@
+\documentclass[12pt]{article}
+\begin{document}
+\author{Luyu Liu}
+
+\newcounter{para}
+\newcommand\para{\par\refstepcounter{para}\thepara\space}
+
+\section*{CSE 5194 WEEK3- Basic idea}
+    \title{CSE 5194 WEEK3 - Basic idea}
+   
+    \paragraph{Define-by-run and define-and-run}
+    Which of them has better performance:
+    \\Define-and-run: tensorflow, caffe, Torch, Theano
+    \\Define-by-run: Pytorch and Chainer.
+    \\Compiler: define-and-run is always better; However, the usage is easier for define-by-run;
+
+    \paragraph{Impact of model size and dataset size}
+    large models means better accuracy; More data means better accuracy;
+
+    single-node training; good for small model and small dataset.
+    number of parameters is adjustable. Deep and wider models.
+
+    When data is larger than the model. Example: Over-fittting. Give Phd student several simple words. The model will remember.
+    
+    When data is smaller than the model. Give children an essay and they only know letters. The model is small. The data is big.
+    The model cannot comprehend what data says: under fitting.
+
+    Should be able to classify.
+    Alexnet:smaller
+    100 layers: large.
+
+    What is distributed good for:  Large model and large dataset
+
+    In deep learning: good enough is good. In computation: exact.
+
+    \subparagraph{Overfitting and underfitting}
+    Capacity: capacity is low, then underfitting; is high, then overfitting.
+
+    \paragraph{Impact of large batch size}
+    Why is large batch size good? Faster to converge. Save the time.
+    \\ Batch size: 1: SGD. good for accuracy, bad for performance.
+    \\ Batch size = n: Full. Update the weights less often.
+
+    Batch size for GPU:256. For the PPT, it's 8k.
+
+    More GPUs, less training time, more time for syns.
+
+    \subparagraph{Why large batch size sucks}
+    Hyperparameters cannot be learnt. 
+
+    \subparagraph{Synchronization}
+    The lecture's realm: how to make Synchronization faster.
+    Faster network; algorithm (rings)
+    It has nothing to do with deep learning, but distributed systems.
+
+    The point is to reduce the time for broadcast and reduce.
+
+    \paragraph{Parallelization Strategies} The definitions:
+    \\Model Parallelization: 
+    \\Data Parallelization: received the most attention.
+
+    \subparagraph{Data-parallel deep learning and MPI collectives}
+    Major MPI collectives involves in designing distributed framworks.
+
+    HPC is different from the multi-GPU trainig.
+
+    Model Parallelization is difficult since that requires the understanding of the model per se.
+
+
+    \section*{HPC}
+    \paragraph{What is HPC} High performance computation
+
+    \paragraph{Curerent application}
+    A lot of them.
+
+    \subparagraph{FLOPS} Floating point operation per seconds.
+    \end{document}
