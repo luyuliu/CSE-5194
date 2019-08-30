@@ -1,0 +1,154 @@
+\documentclass[12pt]{article}
+\begin{document}
+\author{Luyu Liu}
+
+\newcounter{para}
+\newcommand\para{\par\refstepcounter{para}\thepara\space}
+
+\section*{CSE 5194 WEEK4 - HPC}
+\title{CSE 5194 WEEK4 - HPC}
+\section{Major components in computing systems}
+Processing bottlenecks; I/O interface bottlenecks; Network bottlenecks;
+\subparagraph{Processing bottlenecks}
+ex: TCP/IP; UDP/IP
+\\ Generic architecture for all networks;
+\subparagraph{IO interface bottlenecks}
+relied on bus-based traditionally. : last mile bottleneck;
+
+PCI and PCIX.
+one bit per wire;
+
+Not scalable: cross talk tetween bits; skew between wires; signal integrity.
+
+\subparagraph{network bottlenecks}
+Then, ethenet and other: network speeds saturated at around 1 Gbps.
+
+1979 - 1993, people were happy about the netspeed.
+
+\subparagraph{motivation for infiniband and high-speed ethenet}
+90s, how to eliminate these bottleneck;
+internet is already there, high speed has to connect to that, make sure still work.
+
+\subparagraph{IB trade association}
+To design a scalable and high performance communication and IO architacture by taking an integrated view of computing, networking, and storage techonologies.
+
+They want to put things together.
+
+\subparagraph{high-speed ethenet consortium}
+10 GE - 100 GE;
+To achieve ... while maintaing backward compatibility with ethenet.
+
+If just increase Ethenet, the user won't have methods to move their data to the network. Other bottleneck.
+
+Expensive.
+
+
+\section{Overcome the bottlenecks}
+\paragraph{Internet}
+\subparagraph{bottleneck alleviation : infiniband and high speed ethernet}
+infiniband: two words: infinite bandwidth.
+
+Bit serial differential signaling: techonologiy: independent paris of wires to transmit independent data (lane)
+can replicate each lane: easy to incrase clock speed of lanes.
+theoretically, no perceived limit on the bandwidth;
+
+
+networkd speed accesslation with IB and HSE:
+sdr: 2G bit / sec, this  is per lane.
+DDR: 4 G bit / sec, per lane.
+
+\subparagraph{caabilities of HP netowkrs}
+Processor: if communication is needed, should processor handle that, or we assign another.
+
+if you can desing a system that can scale between communication and computation.
+
+Using a sectectory.
+
+
+intelligent network interface card;
+
+support entire protocol processing completely in hardware.
+
+Provide a rich communication interface to applications.
+
+\subparagraph{previous high-performance network stacks}
+Fast messages;
+
+Virtual interface architecture: Virtualprecursor to IB.
+
+\subparagraph{ib hardware acceslation}
+Some IB models have multiple hardware accelerators.
+
+Protocol offload engines.
+
+Additional hardware supported features also present; RDMA Multicasst;
+
+\subparagraph{ethenethardware acceleration}
+Jumbo frames;
+cost of performance data.
+TOE and iWARP acceslerators.
+TCP offfload engines (TOE)
+
+iWARP:
+Going inside it's all RDMA. 
+
+\subparagraph{Converged ethernet}
+
+\paragraph{IO bottleneck solutions}
+\subparagraph{interplay with io technologies}
+Infiniband intitially intended to replace io bus tech with networking like technology.
+
+Enterprise game: change the hardware is hard.
+
+Both IB and HSE today is injected into the IO as a adaptor.
+\subparagraph{Trends} Almost the same as the network.
+Intel: PCIe. 
+
+ALso need a kind of network within the system: QPI
+
+So, before node-to-node tech is going inside the system.
+
+\subparagraph{comparing ib with traditional entworking stack}
+Tradtional vs Infiniband: 
+
+phisical lyaer: similar
+
+link layer: flow ocntrol:
+Only opensm between link and py
+
+transporta: RC and UD: similar to TCP UDP:
+
+sockets interface in traditional: Verbs: bring user communication;
+
+\subparagraph{RCPIP stack vs IPoIB}
+
+sockets takes time: change to verbs for application and middleware.
+
+start at RDMA: In computing, remote direct memory access (RDMA) is a direct memory access from the memory of one computer into that of another without involving either one's operating system. This permits high-throughput, low-latency networking, which is especially useful in massively parallel computer clusters.
+Extent the idea: directly access the memory without the node knowing.
+
+Then: userspace.
+
+\subparagraph{components; chanel adapters}
+
+\subparagraph{components; links and repeater}
+network links:
+
+traditional adapter built for copper calbing; To short
+
+
+interl connects: optical cables: 550 picoseconds.
+
+
+communication within the chanel semantics.
+
+commjnication within the memory semantics:
+RDMA: have some trust, just expose some of the memory
+Data direcly go into the memory: without going thru QP
+
+
+
+
+
+
+\end{document}
