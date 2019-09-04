@@ -1,0 +1,93 @@
+\documentclass[12pt]{article}
+\begin{document}
+\author{Luyu Liu}
+
+\newcounter{para}
+\newcommand\para{\par\refstepcounter{para}\thepara\space}
+
+\section*{CSE 5194 WEEK5 - HPC}
+\title{CSE 5194 WEEK5 - HPC}
+\section{HPC continue}
+
+\paragraph{RSockets}
+Implements various socket like functions functions:
+\\ functions take smae parmeters as sockets.
+
+\subparagraph{RDMA over converged enhanced ethernet (RoCE)}
+network stack comparison
+
+Pros: IB vs RoCE:
+works natively in ethernet environments.
+
+Not working with traditional network management tools: that's where v2 kicks Implements
+
+\paragraph{OmniPath}
+Pathcalse came upwith initial version of BI based product.
+
+Qlogic enhanced the product with the PSM sotware interface.
+
+The IB product of QLogic was acquired by intel.
+
+network on loading: offloading.
+
+OFI: Omnipath adapter: no competition.
+
+\paragraph{conclusion}
+all model support RDMA;
+
+\paragraph{OpenFabrics}
+openIB: specification, but people were not following the standard.
+
+Verbs interface: openfabrics stack with uniied verbs interface:
+
+User actaully has a lot of choices: user leel, kernel level, adapters.
+
+\subparagraph{libfabrics: software stack}
+OpenFabrics Interfaces (OFI) is a framework focused on exporting fabric communication services to applications. OFI is best described as a collection of libraries and applications used to export fabric services. The key components of OFI are: application interfaces, provider libraries, kernel services, daemons, and test applications.
+
+Interconnect: IB, ethernet, Omnipath. Competing schemas.
+
+top500.org: actually infiniband and custom have the largest performance share, meaning that some largest supercomputer are suing them.
+
+\subparagraph{Ethernet based scientific computing installations}
+Most are chinese. alibaba, baidu data center. Benchmark: high performance and submit.
+
+\section{HPC part II}
+\paragraph{Frequency and power} Exponential.
+
+\subparagraph{Tick Tock}
+Tick–tock was a production model adopted in 2007 by chip manufacturer Intel. Under this model, every microarchitecture change (tock) was followed by a die shrink of the process technology (tick). Its replacement was announced in 2016, called "Process, Architecture, Optimization", and is similar to a tick–tock cycle, followed by an optimization phase.
+
+\paragraph{AVX technology}
+History: clay. Vector machine: Advanced Vector Extensions
+SIMD: Single instruction, multiple data
+Advanced Vector Extensions
+
+512 bits SIMD Extensions
+
+
+\paragraph{motivation}
+GPU grows way faster than CPU.
+
+GPU hardware:
+
+\paragraph{Supercomputing products}
+Tesla C1070: server blade.
+
+NVIDIA Volta is optimized for deep learning workloads: 
+has dedicated tensor cores for both training and inference.
+
+
+\subparagraph{volta nvlink}
+Extra channels between each GPUS.
+
+\paragraph{ARM}
+Lowpower processors: 
+
+\paragraph{TPU, IPU, and other architectures}
+Talk later. quickly skim thru.
+
+
+
+
+\end{document}
