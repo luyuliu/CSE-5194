@@ -1,0 +1,89 @@
+\documentclass[12pt]{article}
+\begin{document}
+\author{Luyu Liu}
+
+\newcounter{para}
+\newcommand\para{\par\refstepcounter{para}\thepara\space}
+
+\section*{CSE 5194 WEEK6 - HPC}
+\title{CSE 5194 WEEK6 - HPC}
+\section{Trend in high-performance storage}
+
+\paragraph{NVM}
+PCIe SSDs standard. non-valatile memory express (NVMe)
+
+expanding NVMe to fabrics.
+
+\paragraph{Communication middleware}
+parallel programming models:
+\subparagraph{provide abstract machine models}
+models can be mapped on different types of systems: distributed shsared moemory DSM, MPI within a node.
+
+\paragraph{MPI}
+
+\subparagraph{allreduce collective communication pattern}
+ui
+\subparagraph{GPU aware MPI liabrary MVAPICH2-GDR}
+
+\section{Caffe - deep learning framework}
+\subsection{inner working of neural networks}
+$$y = w \cdot x + b$$
+
+$$y = g(Wx + b)$$
+g is the non linear transporformation: maybe we are warping the space.
+
+\subparagraph{concepts}
+$$z = g(Vg(Wx+b))$$
+
+\subparagraph{classification using neural nework=}
+
+$P(y|x) = sfmax(Wg(Vf(x)))$
+
+\subparagraph{traning}
+$L(x, i^*) = logP(y=i^*|x)$
+
+\subparagraph{complexity of forwar propagation and back propagation}
+
+\subparagraph{conclusion}
+
+\subsection{caffe}
+convolutional architecture for fast feature embedding
+
+Alexnet;
+
+HPilosophy behind developing Caffe:
+
+\paragraph{expression}
+models and optimizations are defined as plaintext schemas instead of code.
+
+\paragraph{highlight}
+Speration of representation and implementation:
+Caffe model definitions are written as config files using the protocol buffer language
+
+Test coverage: Every single module in  caffe is tested/
+
+Python and matlab; pretrained model.
+
+\paragraph{data storage}
+stores using blobs;
+\subsubsection{blobs}
+traditionally, stored in 4D arrray.: why?
+
+\subsubsection{protocol buffers}
+level DB is a key value store builty by google: it is a file system;
+doesn't provide a server or cmd.
+
+models are stored to disk as buffers.
+
+\subsubsection{layers and networks and run mode}
+layers has to roles: I forget
+bookkeeping for all directed acyclic graph of layers
+
+\subsubsection{Solver}
+SGD; ADADELTA; ADAPTIVE GRADIENT;
+
+run: ./build.tools/caffe train foo.prototext
+
+Take a lot of time to create originally
+
+\end{document}
