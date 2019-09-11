@@ -1,0 +1,81 @@
+\documentclass[12pt]{article}
+\begin{document}
+\author{Luyu Liu}
+
+\newcounter{para}
+\newcommand\para{\par\refstepcounter{para}\thepara\space}
+
+\section*{CSE 5194 WEEK7 - Pytorch and tensorflow}
+\title{CSE 5194 WEEK6 - HPC}
+\section{Numpy and deep learning}
+
+Most functions have similar form.
+
+
+\section{pytorch}
+\subsection{Autograd:}
+\subsection{Torch.NN} Like Keras.
+Define model and feed data.
+
+\subsection{Torch.optim}
+package desined for implementation various optimization algorithms.
+
+Provide all kind of Adadelta optimzator.
+
+Does support GPU.
+
+\subsection{Dataloader}
+Efficient way to load data. Torch.utils.data.
+
+
+\section{Tensorflow}
+
+Igh level package for fast prototyping.
+
+\subsection{Static and dynamic graph}
+Define by run TO define and run.
+
+\subsection{Tensorflow.optimizer}
+
+\subsection{Tensorflow.loses}
+
+\subsection{Keras}
+compile: saving loops. Can run instantly.
+
+
+
+\section{MXnet and Chainer}
+\subsection{RNNSs and LSTM memory'Recurrent NN}
+Long short-term memory: has feedback onnections to process both single data points and full data sequencesf
+
+case study: atari games;
+
+\subsection{problems with define and run problems} 
+\paragraph{ineffieicent memory usage} Computational graph built before model traning;
+
+\paragraph{Limied extensibility} Options are limited: fork or hack
+
+\paragraph{innerworkings not accessible to the user} Computational graph becomes a black box in the define-and-run model.
+
+\subsection{define-by-run}
+
+\section{Chainer}
+Python: cupy for GPU ; supports popular optimization methods.
+
+\paragraph{MLP} Prosess
+
+Function set definition
+
+Initialize the opitmizer:
+
+Use the foward method, and se relu activation functions.
+
+training loop; nested for loops for batch trainign. Avae variables on GPU.
+
+\paragraph{Perforamnce}
+Still worse than caffe, however, it can easily tune the network.
+
+\section{MXnet}
+
+
+\end{document}
