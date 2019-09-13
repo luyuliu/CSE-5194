@@ -1,0 +1,98 @@
+\documentclass[12pt]{article}
+\begin{document}
+\author{Luyu Liu}
+
+\newcounter{para}
+\newcommand\para{\par\refstepcounter{para}\thepara\space}
+
+\section*{CSE 5194 WEEK8 - MXNET}
+\title{CSE 5194 WEEK8 - MXNET}
+
+\section{MXNET}
+\subsection{Abstract}
+It is a multilanguage;
+
+Imperativve : how computation neeeds to be performed;
+
+Declarative: what needs to be done;
+
+Concrete: result returned right away on same thread;
+
+Asynchronous: statements gathered and transformed into dataflow graph first>>?????
+
+MXNET: blending approaches:
+Supports declarative programming to specify the computation structure.
+
+Multiple host languages:
+
+fuse different programming language and paradigms into the same 
+
+\subsection{MXNET programming interface}
+\paragraph{Symbol} declare the ocmputational graph, composited by operators.
+
+Julia.
+
+
+\paragraph{NDArray} Imperative tnsor computation;
+lazy evaluation of NDArray: do not have to declare.
+
+\paragraph{KVStore} Distributed key-value store for data synchronization over mltiple devices
+
+Tow primitives push and pull: dependence kernel.
+
+\paragraph{Other modules}
+MXNET has tools to pack all things into one file.
+
+\subsection{Implementation}
+\paragraph{computation graph}
+
+only the subgraph required to botain outputs specifed during bingding.
+
+Operators can be gropued : $a\cdot b + 1$ can be grouped.
+
+\paragraph{memory allocation}
+bariable lifetime is know for computation graph.
+linear time: Inplace: if 
+
+\paragraph{dependency engine}
+each source unit registered to engine with unique tag;
+
+scheduled pushed operatiosn;
+
+KVStore based on parameter server
+
+\subsection{performance}
+Closely as caffe and torch
+
+Good at managing memory. Especially with inplace and co-share.
+
+MXNET is pretty scalable, which could be linear. But the linear won't last forever.
+
+\section{LBANN}
+Livermore big aNN;
+\subsection{introduction}
+
+Bias: how poorly the model listens to training data.
+
+\subsection{design}
+based on distributed matrices
+
+autoencoders: the choice of input features is as important as learnng algorithm
+
+send feature is way more easy for the model to undersatnd. Rather than the raw dta.
+
+autoencoders learn greate feature representations of data.
+
+unsupervised/
+
+First: 784size encoder -> 100size encoder output -> 100 input discoder -> 784 encoder:
+In this process, we train the model as a compressor. To derive major features;
+
+allow data and model parallelism
+
+
+
+
+
+
+\end{document}
