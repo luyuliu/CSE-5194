@@ -1,0 +1,115 @@
+\documentclass[12pt]{article}
+\begin{document}
+\author{Luyu Liu}
+
+\newcounter{para}
+\newcommand\para{\par\refstepcounter{para}\thepara\space}
+
+\section*{CSE 5194 WEEK9 - Fine-grained parallelism for deep neural networks}
+\title{CSE 5194 WEEK9 - fine-grained parallelism for deep neural networks}
+
+\section{Overview and background}
+\subsection{Deep learning review} 
+Feature extraction and classsification: machine learning has to extract the features manually.
+
+based on learning data representation
+examples: cnn rnn hnn
+
+\subsection{CNN}
+
+dense layer and convolution layer
+
+convolution operation and activation function and pooling
+
+\paragraph{convolution operation} finput * filter = result
+
+matrix multiplying
+
+\paragraph{why convolution?} want to find the boundary: can find the edges.
+
+Found vertical edge;
+
+different filter
+
+example: sobel filter: get boundary.
+
+Filter is not actually computational intensive compared to the newcounter
+
+\subparagraph{How to improve performance }
+ There are actually a lot of features and boundaries so he has to set threshold.
+
+stride = 4: means the output is a quarter of the input.
+
+\paragraph{pooling layer}
+ 
+To reduce the size ofthe input;
+
+summarized the information for a particular part of the image;
+
+same as convolution, only operation is different.
+
+MAX pooling: find the max value in each section: 
+
+CNN: feature learning: CNN + relu and pooling, with several layers of them
+And classification: normal fully connected layers.
+
+\subsection{MPI}
+How can i distribute a program acorss multiple machines
+
+wee needa commnication interface to establish comjunication across differnet instances of a program on multiple devices
+\paragraph{MPI collective comjnication}
+input multple processes or one root process communicate dataa to processes
+
+output: reduced reuslt from multple sources or same data from root sources
+
+MPI MAX MIN SUM PROD
+
+mpi bcast
+
+mpi allreduce
+
+\paragraph{parallelization strategies}
+broadly there are three types of parallelization: 
+\subparagraph{data parallelism}
+divide data to achieve parallelism;
+
+\subparagraph{model parallelism} several
+
+Layer parallelism: 
+spatial parallelism;
+channel parallelism 
+filter parallelism
+
+\subparagraph{hybrid parallelism0}
+
+\subsection{spatial parallelism}
+Sometimes the image is too large to fit into the GPU
+
+\paragraph{halo region}
+Halo region is an area which is not present n the current input butrequired to perform convolution
+
+send recv operation between processes
+region size depends on the strides and filter size
+
+\paragraph{performance model}
+time ofr forward propagation:
+
+4 send operations: shagnxiazuoyou
+
+4 another send operation: the four corners.
+
+backward propagation:
+
+with respect to inputs: same as forwards propagation;
+
+with respect to weights: computation itme.
+
+All reduce time
+
+\subsection{conslution}
+spatial is suitable for later spatial input.
+
+
+
+
+\end{document}
