@@ -1,0 +1,72 @@
+\documentclass[12pt]{article}
+\begin{document}
+\author{Luyu Liu}
+
+\newcounter{para}
+\newcommand\para{\par\refstepcounter{para}\thepara\space}
+
+\section*{CSE 5194 WEEK10 - Fine-grained parallelism for deep neural networks}
+\title{CSE 5194 WEEK10 - fine-grained parallelism for deep neural networks}
+\section{Result of spatial parallelism}
+Strong scaling: not linear.
+Weak scaling is good.
+
+Strong scaling is hard to do. communication.
+
+\section{Imagenet and VGG}
+
+\subsection{CNN}
+CNN and pooling and FC layers
+
+\subsection{AlexNet and VGG}
+two comon measures
+
+top1 error;
+
+top5 error;
+
+\subsection{AlexnET}
+\paragraph{RELU nonlinearity}
+why relu instead of tanh function:
+
+it converge faster; 6 times faster.
+
+computation load;
+
+tanh sturates at very high or very low values of z
+
+rulu functions slope is not close to zero for higher positive values of z
+(converge faster)
+
+\paragraph{training on multiple GPUS}
+too big to fit on the single GPUS
+
+
+\paragraph{paralleliszation scheme}
+put half of the kernels on each gpu, and the gpus communicate only in certain layers.
+
+kernels of the second, 3,4,5 cnn layer only connected to those kernel maps in  hte previos layer which reside on he same gpu
+
+
+\paragraph{Local response normalization}
+
+\paragraph{pooling layer}
+there are overlapping and nonoverlapping. It depends on the stride.
+
+\paragraph{dropout}
+use dropout in first two fully connect layersincresing hte number of iterations needed to voncer bya  factor of 2;
+
+The answer to these questions is “to prevent over-fitting”.
+
+\paragraph{results}
+
+
+\subsection{VGG}
+decrease parameters to optimize
+
+C and D: 'a stack of two 3*3 layers cnn has an effective receptive field of 5*5 theree such layers have a seven multiple seven 
+
+l
+
+
+\end{document}
