@@ -1,0 +1,56 @@
+\documentclass[12pt]{article}
+\begin{document}
+\author{Luyu Liu}
+
+\newcounter{para}
+\newcommand\para{\par\refstepcounter{para}\thepara\space}
+
+\section*{CSE 5194 WEEK11 - Googlenet}
+\title{CSE 5194 WEEK11 - Googlenet}
+\section{Googlenet}
+
+\subsection{introduction}
+\paragraph{network in network}
+
+\paragraph{price of going deeper}
+biggersize typically means a larger number of parameters, make prone to overfitting
+
+imporved utilizataion of the computing resources inside the network
+to allow the network to be deeper without increasing computation
+
+to be able to run inference in mobile and embedded devices - devices where memory and power use matters.
+
+hebbian princiel introduce sparsity;
+
+raplace the fully nconnneced layer by connected overfitting
+
+\paragraph{what is hebbian principle} 
+
+It will also increase a lot of operation for each layer
+
+optimized version: for multiple channel, merge three channel into one.
+
+with 1*1 convolution for example, it will save operation time by 100 times
+
+\subsection{vanishing gradient}
+Lost function will did help this
+
+emsemble prediction
+l
+
+\section{REsNET}
+overfitting; vanishing gradient;degradation
+
+\subsection{degradation}
+with network depth increasing, the accury se saturated  , then degrades suddenly;
+
+this is not overfitting; traiing error is increasing with depth
+u
+\subsection{residual block}
+how does it solve vanishing gradient;
+
+add another itme to make the gradient non-zero0gf   
+
+
+
+\end{document}
