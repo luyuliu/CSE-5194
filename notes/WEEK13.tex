@@ -1,0 +1,50 @@
+\documentclass[12pt]{article}
+\begin{document}
+\author{Luyu Liu}
+
+\newcounter{para}
+\newcommand\para{\par\refstepcounter{para}\thepara\space}
+
+\section*{CSE 5194 WEEK13 - Speech}
+\title{CSE 5194 WEEK13 - Speech}
+\section{Speech}
+
+\subsection{RNN basics and seq2seq recap}
+\paragraph{RNN}
+not all problems can be converted into on with fixed length inputs and outputs;
+
+It takes previosu output or hiddden states as inputs;
+
+Contain historical information;
+
+\paragraph{sample feed-forward network}
+
+\paragraph{multi-ayer RNNN and bidirection RNNs}
+Bi direction: will forget if the sequence is really long.
+
+\section{Paper 1}
+\subsection{Alignments}
+words in different languages may be not one to one
+
+\subsection{Neural speedch transducers}
+
+\subsection{CTC: connectionist temporal classification}
+it assumes conditional independece between output predictions;
+
+\subsection{RNN-transducer}
+transcription network: bidirectional rnn encoder; prediction network.
+
+\subsection{attention score}
+
+
+\subsection{major diffrfernce:}
+hard alignments: one to one between input and output: CTC and RNN-transducer use it.
+soft alignments: one to some.
+
+\subsection{experiments}
+
+beam search: only take top 5 most probable words;
+greedy search: only take top 1.
+
+
+\end{document}

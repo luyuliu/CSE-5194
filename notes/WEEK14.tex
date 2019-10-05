@@ -1,0 +1,44 @@
+\documentclass[12pt]{article}
+\begin{document}
+\author{Luyu Liu}
+
+\newcounter{para}
+\newcommand\para{\par\refstepcounter{para}\thepara\space}
+
+\section*{CSE 5194 WEEK14 - MPI}
+\title{CSE 5194 WEEK14 - MPI}
+
+\section{Deep learning with COTS HPC systems}
+scaleup and scale out
+
+Scale-up is done by adding more resources to an existing system to reach a desired state of performance
+
+Scale-out is usually associated with distributed architectures
+
+\subsection{contribution}
+Implementation of a large--scale model-parallel training system for DNNs.
+
+\subsection{Proposal}
+Alternative approach to training such networks that with over 1 million
+
+\subsection{Achieve scaling challenges}
+commjunication bottlenecks; sofrware challenge: how to manage and design altorightm
+
+4 - 8 we will face problems: cooling, commjunication;
+
+\subsubsection{Implementation}
+it solves:
+
+requirehighly optimized GPU node for alll major compiar 
+
+Computational overhead: $M * w*w*c$
+
+with CUDA kernels: it requires expert knowledge of each gpu architecture.
+
+\section{Second paper}
+super large minibatch
+
+RMS prop warmup: start the traing with RMS prop then gradually transition to SGD
+
+
+\end{document}

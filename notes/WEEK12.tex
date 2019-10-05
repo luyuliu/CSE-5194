@@ -1,0 +1,64 @@
+\documentclass[12pt]{article}
+\begin{document}
+\author{Luyu Liu}
+
+\newcounter{para}
+\newcommand\para{\par\refstepcounter{para}\thepara\space}
+
+\section*{CSE 5194 WEEK12 - Speech}
+\title{CSE 5194 WEEK12 - Speech}
+\section{Speech}
+\subsection{Introduction}
+\paragraph{RNN} Can reconnect to former layer
+\paragraph{Search space} set or domain through which an algorithm serachs
+
+\subsection{Deep learning drawbacks}
+Training process is slow.
+
+larger dataset
+
+transferability.
+
+\subsection{NASNet}
+Learning  transferable architecture for scalable image recognition.
+
+\subsection{Neural archiecture search NAS}
+
+overall architectures manually predetermined;
+
+normal cell: convolutional cell thatreturns feature map of same dimension;
+
+reduction cell: convolutional cell taht returns feature map with heoght and width reduced by 2;
+
+Basically a bunch of operations.
+
+\subsection{result}
+
+the controler just learn the inner structure of a single cell, instead of the overall network structure.
+
+\section{DeepSpeech}
+
+
+\subsection{RNN in deep speech2}
+
+first three layers are the normal layers;
+
+fouth layer is the diverse recurrent layers;
+
+fifth layer merge
+
+\subsection{Regularization}
+regularization:'
+
+time series.
+
+Lombard effect: speakers change pitch or inflection to ovrsome noise around them;
+
+
+
+
+
+
+
+
+\end{document}
