@@ -35,7 +35,7 @@ print('train samples:', len(training_data))
 print('test samples:', len(test_data))
 
 
-def train(model, data, test_data, optimizer, loss_fn, n_epoch=10):
+def train(model, data, test_data, optimizer, loss_fn, n_epoch=5):
     print('=========training=========')
     model.train()
     for epoch in range(n_epoch):
