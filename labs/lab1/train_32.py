@@ -69,10 +69,10 @@ def test(model, data):
         Y = to_var(torch.LongTensor(Y)) # (bs,)
         pred = model(X) # (bs, ans_size)
         loss = loss_fn(pred, Y)
-        losses += torch.sum(loss).data[0]
+        losses += torch.sum(loss).data.items()
         _, pred_ids = torch.max(pred, 1)
         # print('loss: {:.4f}'.format(loss.data[0]))
-        correct += torch.sum(pred_ids == Y).data[0]
+        correct += torch.sum(pred_ids == Y).data.items()
         counter += X.size(0)
 
     print('Test Acc: {:.2f} % ({}/{})'.format(100 * correct / counter, correct, counter))
