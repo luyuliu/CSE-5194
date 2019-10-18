@@ -78,6 +78,7 @@ def test(model, data):
     print('Test Acc: {:.2f} % ({}/{})'.format(100 * correct / counter, correct, counter))
     print('Test Loss: {:.4f}'.format(losses/counter))
 
+
 model = GatedCNN(seq_len, vocab_size, embd_size, n_layers, kernel, out_chs, res_block_count, vocab_size)
 if torch.cuda.is_available():
     model.cuda()
