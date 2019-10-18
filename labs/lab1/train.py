@@ -18,7 +18,7 @@ res_block_count = 5
 batch_size      = 64
 
 
-words = read_words('C:\\Users\\liu.6544\\Downloads\\123\\heldout-monolingual.tokenized.shuffled', seq_len, kernel[0])
+words = read_words('/users/PAS1588/liuluyu0378/lab1/1-billion-word-language-modeling-benchmark-r13output/training-monolingual.tokenized.shuffled', seq_len, kernel[0])
 word_counter = collections.Counter(words).most_common(vocab_size-1)
 vocab = [w for w, _ in word_counter]
 w2i = dict((w, i) for i, w in enumerate(vocab, 1))
