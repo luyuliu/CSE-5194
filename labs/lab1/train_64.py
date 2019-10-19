@@ -83,6 +83,7 @@ def test(model, data):
 
 model = GatedCNN(seq_len, vocab_size, embd_size, n_layers, kernel, out_chs, res_block_count, vocab_size)
 if torch.cuda.is_available():
+    print("cuda")
     model.cuda()
 optimizer = torch.optim.Adadelta(model.parameters())
 loss_fn = nn.NLLLoss()
