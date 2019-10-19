@@ -1,4 +1,4 @@
-import collections
+import collections, time
 import random
 
 import torch
@@ -39,6 +39,7 @@ def train(model, data, test_data, optimizer, loss_fn, n_epoch=5):
     print('=========training=========')
     model.train()
     for epoch in range(n_epoch):
+        a = time.time()
         print('----epoch', epoch)
         random.shuffle(data)
         for batch_ct, (X, Y) in enumerate(data):
@@ -55,7 +56,8 @@ def train(model, data, test_data, optimizer, loss_fn, n_epoch=5):
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-        print('current performance at ecpoh', epoch)
+        b = time.time()
+        print('current performance at ecpoh', epoch, "time:", b-a)
         test(model, test_data)
 
 
@@ -77,7 +79,6 @@ def test(model, data):
 
     print('Test Acc: {:.2f} % ({}/{})'.format(100 * correct / counter, correct, counter))
     print('Test Loss: {:.4f}'.format(losses/counter))
-
 
 model = GatedCNN(seq_len, vocab_size, embd_size, n_layers, kernel, out_chs, res_block_count, vocab_size)
 if torch.cuda.is_available():

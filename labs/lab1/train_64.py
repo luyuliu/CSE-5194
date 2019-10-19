@@ -1,5 +1,5 @@
 import collections
-import random
+import random, time
 
 import torch
 import torch.nn as nn
@@ -39,6 +39,7 @@ def train(model, data, test_data, optimizer, loss_fn, n_epoch=5):
     print('=========training=========')
     model.train()
     for epoch in range(n_epoch):
+        a = time.time()
         print('----epoch', epoch)
         random.shuffle(data)
         for batch_ct, (X, Y) in enumerate(data):
@@ -55,7 +56,8 @@ def train(model, data, test_data, optimizer, loss_fn, n_epoch=5):
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-        print('current performance at ecpoh', epoch)
+        b = time.time()
+        print('current performance at ecpoh', epoch, "time:", b-a)
         test(model, test_data)
 
 
