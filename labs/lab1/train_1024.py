@@ -83,7 +83,7 @@ def test(model, data):
         total_len += seq_len
         # losses += torch.sum(loss).data.item()
         # _, pred_ids = torch.max(pred, 1)
-        # # print('loss: {:.4f}'.format(loss.data[0]))
+        print('loss: {:.4f}'.format(loss.float().item()))
         # correct += torch.sum(pred_ids == Y).data.item()
         # counter += X.size(0)
     losses = total_loss / total_len
