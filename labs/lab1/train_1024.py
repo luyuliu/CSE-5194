@@ -73,24 +73,18 @@ def test(model, data):
 
     for batch_ct, (X, Y) in enumerate(data):
         X = to_var(torch.LongTensor(X)) # (bs, seq_len)
-        seq_len = X.size(0)
         Y = to_var(torch.LongTensor(Y)) # (bs,)
         pred = model(X) # (bs, ans_size)
-        # loss = loss_fn(pred, Y)
-        loss, mems = pred[0], pred[1:]
-        loss = loss.mean()
-        total_loss += seq_len * loss.float().item()
-        total_len += seq_len
-        # losses += torch.sum(loss).data.item()
-        # _, pred_ids = torch.max(pred, 1)
-        print('loss: {:.4f}'.format(loss.float().item()))
-        # correct += torch.sum(pred_ids == Y).data.item()
-        # counter += X.size(0)
-    losses = total_loss / total_len
+        loss = loss_fn(pred, Y)
+        losses += torch.sum(loss).data.item() * X.size(0)
+        _, pred_ids = torch.max(pred, 1)
+        # print('loss: {:.4f}'.format(loss.data[0]))
+        correct += torch.sum(pred_ids == Y).data.item()
+        counter += X.size(0)
 
-    # print('Test Acc: {:.2f} % ({}/{})'.format(100 * correct / counter, correct, counter))
-    # print('Test Loss: {:.4f}'.format(loss/counter))
-    print("testloss: ", losses, "perplexity: ", math.exp(losses))
+    print('Test Acc: {:.2f} % ({}/{})'.format(100 * correct / counter, correct, counter))
+    print('Test Loss: {:.4f}'.format(math.exp(losses/counter)))
+    # print("testloss: ", losses, "perplexity: ", math.exp(losses))
 
 
 print(pytorch_total_params)
