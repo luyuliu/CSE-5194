@@ -92,6 +92,6 @@ if torch.cuda.is_available():
     print("cuda")
     model.cuda()
 optimizer = torch.optim.Adadelta(model.parameters())
-loss_fn = nn.NLLLoss()
+loss_fn = nn.CrossEntropyLoss()
 train(model, training_data, test_data, optimizer, loss_fn)
 # test(model, test_data)
