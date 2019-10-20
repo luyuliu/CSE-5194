@@ -68,8 +68,8 @@ def test(model, data):
     model.eval()
     counter = 0
     correct = 0
-    total_loss = 0.0
-    total_len = 0
+    losses = 0.0
+    counter = 0
 
     for batch_ct, (X, Y) in enumerate(data):
         X = to_var(torch.LongTensor(X)) # (bs, seq_len)
