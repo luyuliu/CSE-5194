@@ -69,8 +69,9 @@ def test(model, data):
     counter = 0
     correct = 0
     losses = 0.0
-    for batch_ct, (X, Y, seq_len) in enumerate(data):
+    for batch_ct, (X, Y) in enumerate(data):
         X = to_var(torch.LongTensor(X)) # (bs, seq_len)
+        seq_len = X.size(0)
         Y = to_var(torch.LongTensor(Y)) # (bs,)
         pred = model(X) # (bs, ans_size)
         # loss = loss_fn(pred, Y)
