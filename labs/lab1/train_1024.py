@@ -18,6 +18,8 @@ res_block_count = 5
 batch_size      = 1024
 
 
+model = GatedCNN(seq_len, vocab_size, embd_size, n_layers, kernel, out_chs, res_block_count, vocab_size)
+pytorch_total_params = sum(p.numel() for p in model.parameters())
 
 words = read_words('/users/PAS1588/liuluyu0378/lab1/1-billion-word-language-modeling-benchmark-r13output/training-monolingual.tokenized.shuffled', seq_len, kernel[0])
 word_counter = collections.Counter(words).most_common(vocab_size-1)
@@ -82,7 +84,7 @@ def test(model, data):
     print('Test Loss: {:.4f}'.format(losses/counter))
 
 
-model = GatedCNN(seq_len, vocab_size, embd_size, n_layers, kernel, out_chs, res_block_count, vocab_size)
+print(pytorch_total_params)
 if torch.cuda.is_available():
     print("cuda")
     model.cuda()
