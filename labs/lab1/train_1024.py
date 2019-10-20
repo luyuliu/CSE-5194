@@ -49,7 +49,7 @@ def train(model, data, test_data, optimizer, loss_fn, n_epoch=500):
             X = to_var(torch.LongTensor(X)) # (bs, seq_len)
             Y = to_var(torch.LongTensor(Y)) # (bs,)
             # print(X.size(), Y.size())
-            # print(X)
+            print(X.size(1))
             pred = model(X) # (bs, ans_size)
             # _, pred_ids = torch.max(pred, 1)
             loss = loss_fn(pred, Y)
@@ -73,15 +73,15 @@ def test(model, data):
 
     for batch_ct, (X, Y) in enumerate(data):
         X = to_var(torch.LongTensor(X)) # (bs, seq_len)
-        print(X.size(1))
+        print(X.size(0))
         Y = to_var(torch.LongTensor(Y)) # (bs,)
         pred = model(X) # (bs, ans_size)
         loss = loss_fn(pred, Y)
-        losses += torch.sum(loss).data.item() * X.size(1)
+        losses += torch.sum(loss).data.item() * X.size(0)
         _, pred_ids = torch.max(pred, 1)
         # print('loss: {:.4f}'.format(loss.data[0]))
         correct += torch.sum(pred_ids == Y).data.item()
-        counter += X.size(1)
+        counter += X.size(0)
 
     print('Test Acc: {:.2f} % ({}/{})'.format(100 * correct / counter, correct, counter))
     print('Test Loss: {:.4f}'.format(math.exp(losses/counter)))
