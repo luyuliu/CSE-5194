@@ -53,19 +53,19 @@ class GatedCNN(nn.Module):
         A += self.b_0.repeat(1, 1, seq_len, 1)
         B = self.conv_gate_0(x) # (bs, Cout, seq_len, 1)
         B += self.c_0.repeat(1, 1, seq_len, 1)
-        h = A * torch.sigmoid(B)    # (bs, Cout, seq_len, 1)
+        h = A * F.sigmoid(B)    # (bs, Cout, seq_len, 1)
         res_input = h # TODO this is h1 not h0
 
         for i, (conv, conv_gate) in enumerate(zip(self.conv, self.conv_gate)):
             A = conv(h) + self.b[i].repeat(1, 1, seq_len, 1)
             B = conv_gate(h) + self.c[i].repeat(1, 1, seq_len, 1)
-            h = A * torch.sigmoid(B) # (bs, Cout, seq_len, 1)
+            h = A * F.sigmoid(B) # (bs, Cout, seq_len, 1)
             if i % self.res_block_count == 0: # size of each residual block
                 h += res_input
                 res_input = h
 
         h = h.view(bs, -1) # (bs, Cout*seq_len)
         out = self.fc(h) # (bs, ans_size)
-        out = torch.log_softmax(out)
+        out = F.log_softmax(out)
 
         return out
