@@ -73,15 +73,15 @@ def test(model, data):
 
     for batch_ct, (X, Y) in enumerate(data):
         X = to_var(torch.LongTensor(X)) # (bs, seq_len)
-        print(X[1],X.size(0))
+        print(X.size(1))
         Y = to_var(torch.LongTensor(Y)) # (bs,)
         pred = model(X) # (bs, ans_size)
         loss = loss_fn(pred, Y)
-        losses += torch.sum(loss).data.item() * X.size(0)
+        losses += torch.sum(loss).data.item() * X.size(1)
         _, pred_ids = torch.max(pred, 1)
         # print('loss: {:.4f}'.format(loss.data[0]))
         correct += torch.sum(pred_ids == Y).data.item()
-        counter += X.size(0)
+        counter += X.size(1)
 
     print('Test Acc: {:.2f} % ({}/{})'.format(100 * correct / counter, correct, counter))
     print('Test Loss: {:.4f}'.format(math.exp(losses/counter)))
