@@ -68,7 +68,9 @@ def test(model, data):
     model.eval()
     counter = 0
     correct = 0
-    losses = 0.0
+    total_loss = 0.0
+    total_len = 0
+
     for batch_ct, (X, Y) in enumerate(data):
         X = to_var(torch.LongTensor(X)) # (bs, seq_len)
         seq_len = X.size(0)
@@ -84,11 +86,11 @@ def test(model, data):
         # # print('loss: {:.4f}'.format(loss.data[0]))
         # correct += torch.sum(pred_ids == Y).data.item()
         # counter += X.size(0)
-        loss = total_loss / total_len
+    losses = total_loss / total_len
 
     # print('Test Acc: {:.2f} % ({}/{})'.format(100 * correct / counter, correct, counter))
     # print('Test Loss: {:.4f}'.format(loss/counter))
-    print("testloss: ", loss, "perplexity: ", math.exp(loss))
+    print("testloss: ", losses, "perplexity: ", math.exp(losses))
 
 
 print(pytorch_total_params)
