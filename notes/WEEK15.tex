@@ -1,0 +1,59 @@
+\documentclass[12pt]{article}
+\begin{document}
+\author{Luyu Liu}
+
+\newcounter{para}
+\newcommand\para{\par\refstepcounter{para}\thepara\space}
+
+\section*{CSE 5194 WEEK15 - Co-design}
+\title{CSE 5194 WEEK15 - Co-desing}
+\section{Speech}
+
+\section{Co-design}
+\paragraph{Strong copou and weak copoued}
+Weak: treat as black box
+String: C-caffe: strictly control runtime
+
+\paragraph{The need for co-design}
+One is slow;
+Scaling out: 
+
+
+\section{S-cafffe}
+Co desinging MPOI runtimes and caffe for scalable deep learning on d=model gpu clusters
+
+\subsection{CUDA}
+First have to transfer data from local memory to GPU;
+and need to givve back to CPU to exit;
+
+What if move to the remote: to gpu; to cpu; to remote. can be done by the host;
+
+Also, if there is a API, that cna direrctly move to the remote node;
+
+make life easier for the framework (MPI) developer.
+
+\paragraph{can directly read memory?}
+
+DMA:RBMA: Network adaptor will do that for you
+
+\subsection{mpi comminicator} hahaf
+
+\subsection{research challenges}
+bottleneckes for MPI runtimes;
+
+\paragraph{co-design}
+goal: overlap of compuation and comminicationm;
+effieient large ;
+
+\paragraph{S-Caffe basic}
+
+See ppt.
+
+\paragraph{SCOBR:}
+MPI runtimes are unware of user's CUDA streems;
+
+divide each buffer into N chunck and parallel.
+
+
+
+\end{document}

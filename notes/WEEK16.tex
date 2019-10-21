@@ -1,0 +1,66 @@
+\documentclass[12pt]{article}
+\begin{document}
+\author{Luyu Liu}
+
+\newcounter{para}
+\newcommand\para{\par\refstepcounter{para}\thepara\space}
+
+\section*{CSE 5194 WEEK16 - Co-design}
+\title{CSE 5194 WEEK16 - Co-desing}
+
+\section{Co-design}
+\paragraph{Horovod code example}
+Horovod is a distributed training framework for TensorFlow, Keras, PyTorch, and MXNet. The goal of Horovod is to make distributed Deep Learning fast and easy to use.
+
+Horovod is hosted by the LF AI Foundation (LF AI). If you are a company that is deeply committed to using open source technologies in artificial intelligence, machine and deep learning, and wanting to support the communities of open source projects in these domains, consider joining the LF AI Foundation. For details about who's involved and how Horovod plays a role, read the LF AI announcement.
+
+\paragraph{ring-based all-reduce}
+
+\paragraph{Horovod timeline}
+good tools.
+
+\paragraph{tensor fusion}
+One of the unique things about Horovod is its ability to interleave communication and computation coupled with the ability to batch small allreduce operations, which results in improved performance. We call this batching feature Tensor Fusion.
+
+Tensor Fusion works by attempting to combine all the tensors that are ready to be reduced at given moment of time into one reduction operation. The algorithm of Tensor Fusion is as follows:
+
+
+\section{Adam}
+\subsection{Neural networks}
+different bewteen dl and ml:
+
+DL do not need to indentify the "features", which means you could still have sampling and labels, but the process of identify features is automatic.
+
+need large computation
+
+\subsection{Adam itself}
+data server; not just data: translation, rotation;
+\paragraph{asynchronious weigth update}
+Totally asynchronous;
+\paragraph{async batch updates}
+
+totally associate and commutative/
+
+So itt doesn't matter the squence.
+
+\paragraph{local weight computation}
+
+
+\section{Mesh-tensorflow}
+\subsection{synch data-parallelism}
+most communicationbatch split between cores;
+
+all reduce in the end;
+
+fast commnication;
+
+synchronous data-parallelism;
+
+model parallelism is: they are easy to optimize;
+
+\paragraph{device00placement: model paralleism}
+ 
+
+
+
+\end{document}

@@ -1,0 +1,42 @@
+\documentclass[12pt]{article}
+\begin{document}
+\author{Luyu Liu}
+
+\newcounter{para}
+\newcommand\para{\par\refstepcounter{para}\thepara\space}
+
+\section*{CSE 5194 WEEK17 - Application: climate and clicking prediction}
+\title{CSE 5194 WEEK17 - Application: climate and clicking prediction}
+
+\section{Climate}
+Basically semantic segmentation
+\subsection{methods}
+RESNET: short cut; $F(X)+X$ instead of $F(x)$
+
+\paragraph{DenseNet connectivity}
+
+transition up: tranposed convolution 
+
+tarnsition down: bn; relu
+
+concatenation: skip connection.
+
+\subsection{Deeplab v3+}
+\paragraph{atrous convolution}
+dilation rate: 2
+
+with less parameters.
+
+\paragraph{depthwise convolution}
+
+\subsection{Layer-sise adaptive rate control}
+control the magnitude of weight updates
+
+\subsection{channel}
+totally 16 channels
+
+\subsection{single GPU performance}
+1
+
+
+\end{document}
