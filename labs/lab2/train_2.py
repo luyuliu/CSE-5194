@@ -22,6 +22,8 @@ kernel          = (5, embd_size)
 out_chs         = 64
 res_block_count = 5
 batch_size      = 80
+rank            = -1
+world_size      = -1
 
 
 def train(model, data, test_data, optimizer, loss_fn, n_epoch=5):
@@ -73,14 +75,12 @@ def test(model, data):
 #     global best_acc1
 
 if __name__ == "__main__":
-        
-distributed_mode = True
-rank = -1
-world_size = 2
-ngpus_per_node = torch.cuda.device_count()
-os.environ['MASTER_ADDR'] = '127.0.0.1'
-os.environ['MASTER_PORT'] = '5446'
-dist.init_process_group(backend='nccl',init_method='env://', world_size=world_size, rank=0)
+    mp.set_start_method('spawn')
+    distributed_mode = True
+    ngpus_per_node = torch.cuda.device_count()
+    os.environ['MASTER_ADDR'] = '127.0.0.1'
+    os.environ['MASTER_PORT'] = '5446'
+    dist.init_process_group(backend='nccl',init_method='env://', world_size=world_size, rank=rank)
 
     words = read_words('/users/PAS1588/liuluyu0378/lab1/1-billion-word-language-modeling-benchmark-r13output/training-monolingual.tokenized.shuffled', seq_len, kernel[0])
     word_counter = collections.Counter(words).most_common(vocab_size-1)
