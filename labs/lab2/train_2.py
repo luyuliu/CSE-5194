@@ -78,10 +78,8 @@ if __name__ == "__main__":
     rank = -1
     world_size = 2
     ngpus_per_node = torch.cuda.device_count()
-    os.environ['CUDA_VISIBLE_DEVICES'] ='0,1'
     os.environ['MASTER_ADDR'] = '127.0.0.1'
-    os.environ['MASTER_PORT'] = '5445'
-    os.environ['WORLD_SIZE'] = '2'
+    os.environ['MASTER_PORT'] = '5446'
     dist.init_process_group(backend='gloo',init_method='env://', world_size=world_size, rank=0)
 
     words = read_words('/users/PAS1588/liuluyu0378/lab1/1-billion-word-language-modeling-benchmark-r13output/training-monolingual.tokenized.shuffled', seq_len, kernel[0])
