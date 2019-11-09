@@ -23,8 +23,9 @@ def main():
     args.world_size = args.gpus * args.nodes
     os.environ['MASTER_ADDR'] = '127.0.0.1'
     os.environ['MASTER_PORT'] = '8888'
+    print("starting")
     mp.spawn(train, nprocs=args.gpus, args=(args,))
-
+    print("finished")
 
 class ConvNet(nn.Module):
     def __init__(self, num_classes=10):
@@ -79,6 +80,7 @@ def train(gpu, args):
 
     start = datetime.now()
     total_step = len(train_loader)
+    print("loaded")
     for epoch in range(args.epochs):
         for i, (images, labels) in enumerate(train_loader):
             images = images.cuda(non_blocking=True)
