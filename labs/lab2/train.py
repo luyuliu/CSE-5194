@@ -44,6 +44,7 @@ def train(model, data, test_data, optimizer, loss_fn, n_epoch=5):
         random.shuffle(data)
         print(len(data))
         for batch_ct, (X, Y) in enumerate(data):
+            print(batch_ct, X, Y)
             X = to_var(torch.LongTensor(X)) # (bs, seq_len)
             Y = to_var(torch.LongTensor(Y)) # (bs,)
             # print(X.size(), Y.size())
