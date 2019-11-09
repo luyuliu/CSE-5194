@@ -12,6 +12,7 @@ from torch.utils.data import DistributedSampler, DataLoader
 from torch.nn.parallel import DistributedDataParallelCPU, DistributedDataParallel
 import torch.multiprocessing as mp
 import torch.distributed as dist
+from utils.data_parallel import BalancedDataParallel
 
 
 vocab_size      = 2000
@@ -23,11 +24,15 @@ out_chs         = 64
 res_block_count = 5
 batch_size      = 80
 rank            = 0
-world_size      = 1
+world_size      = torch.cuda.device_count()
 
 
 def train(model, data, test_data, optimizer, loss_fn, n_epoch=5):
     print('=========training=========')
+    setup(rank, world_size)
+    n = torch.cuda.device_count() // world_size
+    device_ids = list(range(rank * n, (rank + 1) * n))
+
     model.train()
     for epoch in range(n_epoch):
         a = time.time()
@@ -71,16 +76,71 @@ def test(model, data):
     print('Test Acc: {:.2f} % ({}/{})'.format(100 * correct / counter, correct, counter))
     print('Test Loss: {:.4f}'.format(losses/counter))
 
-# def main_worker(ngpus_per_node, args):
-#     global best_acc1
+
+def train(gpu, args):
+    rank = args.nr * args.gpus + gpu
+    dist.init_process_group(backend='nccl', init_method='env://', world_size=args.world_size, rank=rank)
+    torch.manual_seed(0)
+    model = ConvNet()
+    torch.cuda.set_device(gpu)
+    model.cuda(gpu)
+    batch_size = 100
+    # define loss function (criterion) and optimizer
+    criterion = nn.CrossEntropyLoss().cuda(gpu)
+    optimizer = torch.optim.SGD(model.parameters(), 1e-4)
+    # Wrap the model
+    model = nn.parallel.DistributedDataParallel(model, device_ids=[gpu])
+    # Data loading code
+    train_dataset = torchvision.datasets.MNIST(root='./data',
+                                               train=True,
+                                               transform=transforms.ToTensor(),
+                                               download=True)
+    train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset,
+                                                                    num_replicas=args.world_size,
+                                                                    rank=rank)
+    train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
+                                               batch_size=batch_size,
+                                               shuffle=False,
+                                               num_workers=0,
+                                               pin_memory=True,
+                                               sampler=train_sampler)
+
+    start = datetime.now()
+    total_step = len(train_loader)
+    for epoch in range(args.epochs):
+        for i, (images, labels) in enumerate(train_loader):
+            images = images.cuda(non_blocking=True)
+            labels = labels.cuda(non_blocking=True)
+            # Forward pass
+            outputs = model(images)
+            loss = criterion(outputs, labels)
+
+            # Backward and optimize
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            if (i + 1) % 100 == 0 and gpu == 0:
+                print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'.format(epoch + 1, args.epochs, i + 1, total_step,
+                                                                         loss.item()))
+    if gpu == 0:
+        print("Training complete in: " + str(datetime.now() - start))
+
+
 
 if __name__ == "__main__":
+    device = torch.device('cuda' if args.cuda else 'cpu')
     mp.set_start_method('spawn')
     distributed_mode = True
-    ngpus_per_node = torch.cuda.device_count()
-    os.environ['MASTER_ADDR'] = '127.0.0.1'
-    os.environ['MASTER_PORT'] = '5446'
-    dist.init_process_group(backend='nccl',init_method='env://', world_size=world_size, rank=rank)
+    
+    # gpu_devices = ','.join([str(id) for id in world_size])
+    # os.environ["CUDA_VISIBLE_DEVICES"] = gpu_devices
+    # os.environ['MASTER_ADDR'] = '127.0.0.1'
+    # os.environ['MASTER_PORT'] = '5446'
+    # dist.init_process_group(backend='nccl',init_method='env://', world_size=world_size, rank=rank)
+    
+    # world_size (int, optional) – Number of processes participating in the job
+    # init_method (str, optional) – URL specifying how to initialize the process group. Default is “env://” if no init_method or store is specified. Mutually exclusive with store.
+    setup()
 
     words = read_words('/users/PAS1588/liuluyu0378/lab1/1-billion-word-language-modeling-benchmark-r13output/training-monolingual.tokenized.shuffled', seq_len, kernel[0])
     word_counter = collections.Counter(words).most_common(vocab_size-1)
