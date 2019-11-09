@@ -7,6 +7,10 @@ import torch.nn as nn
 from utils import read_words, create_batches, to_var
 from gated_cnn import GatedCNN
 
+import torch.nn.functional as F
+from torch.utils.data import DistributedSampler, DataLoader
+from torch.nn.parallel import DistributedDataParallelCPU, DistributedDataParallel
+
 
 vocab_size      = 2000
 seq_len         = 21
@@ -34,6 +38,11 @@ test_data = data[split_idx:]
 print('train samples:', len(training_data))
 print('test samples:', len(test_data))
 
+def queue_iter_print(q):
+    while True:
+        prt = q.get()
+        if prt == ".end": break
+        print(prt)
 
 def train(model, data, test_data, optimizer, loss_fn, n_epoch=5):
     print('=========training=========')
@@ -48,7 +57,7 @@ def train(model, data, test_data, optimizer, loss_fn, n_epoch=5):
             Y = to_var(torch.LongTensor(Y)) # (bs,)
             # print(X.size(), Y.size())
             # print(X)
-            print(batch_ct, X.size(), Y.size())
+            # print(batch_ct, X.size(), Y.size())
             pred = model(X) # (bs, ans_size)
             # _, pred_ids = torch.max(pred, 1)
             loss = loss_fn(pred, Y)
@@ -83,11 +92,36 @@ def test(model, data):
     print('Test Loss: {:.4f}'.format(losses/counter))
 
 
-model = GatedCNN(seq_len, vocab_size, embd_size, n_layers, kernel, out_chs, res_block_count, vocab_size)
-if torch.cuda.is_available():
-    print("cuda")
-    model.cuda()
-optimizer = torch.optim.Adadelta(model.parameters())
-loss_fn = nn.NLLLoss()
-train(model, training_data, test_data, optimizer, loss_fn)
-# test(model, test_data)
+if __name__ == "__main__":
+    
+    distributed_mode = True
+    rank = None
+    world_size = 2
+
+
+    model = GatedCNN(seq_len, vocab_size, embd_size, n_layers, kernel, out_chs, res_block_count, vocab_size)
+    cuda = None
+    if torch.cuda.is_available():
+        print("cuda")
+        model.cuda()
+        cuda = True
+    else:
+        cuda = False
+
+    if distributed_mode:
+        q.put(f"{rank_prt}Creating distributed sampler")
+        sampler = DistributedSampler(train_dataset, num_replicas=world_size, rank=rank)
+                
+        if cuda:
+            model = DistributedDataParallel(model)
+        else:
+            model = DistributedDataParallelCPU(model)
+            
+    #non-distributed. set the model to DataParallel to increase training speed
+    elif not distributed_mode and cuda:
+        model = torch.nn.DataParallel(model)
+
+    optimizer = torch.optim.Adadelta(model.parameters())
+    loss_fn = nn.NLLLoss()
+    train(model, training_data, test_data, optimizer, loss_fn)
+    # test(model, test_data)
