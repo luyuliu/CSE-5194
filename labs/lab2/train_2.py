@@ -109,7 +109,6 @@ if __name__ == "__main__":
         cuda = False
 
     if distributed_mode:
-        q.put(f"{rank_prt}Creating distributed sampler")
         sampler = DistributedSampler(train_dataset, num_replicas=world_size, rank=rank)
                 
         if cuda:
