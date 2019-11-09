@@ -22,8 +22,8 @@ kernel          = (5, embd_size)
 out_chs         = 64
 res_block_count = 5
 batch_size      = 80
-rank            = -1
-world_size      = -1
+rank            = 0
+world_size      = 1
 
 
 def train(model, data, test_data, optimizer, loss_fn, n_epoch=5):
