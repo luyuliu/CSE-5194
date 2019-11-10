@@ -9,7 +9,7 @@ from gated_cnn import GatedCNN
 
 import torch.nn.functional as F
 from torch.utils.data import DistributedSampler, DataLoader
-from torch.nn.parallel import DistributedDataParallelCPU, DistributedDataParallel
+from torch.nn.parallel import DistributedDataParallelCPU, DistributedDataParallel, DataParallel
 import torch.multiprocessing as mp
 import torch.distributed as dist
 # from utils.data_parallel import BalancedDataParallel
@@ -24,12 +24,12 @@ out_chs         = 64
 res_block_count = 5
 batch_size      = 80
 rank            = 0
-world_size      = torch.cuda.device_count()
+world_size      = 2
 
 
 def train(model, data, test_data, optimizer, loss_fn, n_epoch=5):
     print('=========training=========')
-    setup(rank, world_size)
+    # setup(rank, world_size)
     n = torch.cuda.device_count() // world_size
     device_ids = list(range(rank * n, (rank + 1) * n))
 
@@ -79,15 +79,15 @@ def test(model, data):
 
 
 if __name__ == "__main__":
-    # device = torch.device('cuda' if args.cuda else 'cpu')
-    # mp.set_start_method('spawn')
-    # distributed_mode = True
+    device = torch.device('cuda' if args.cuda else 'cpu')
+    mp.set_start_method('spawn')
+    distributed_mode = True
     
-    # gpu_devices = ','.join([str(id) for id in world_size])
-    # os.environ["CUDA_VISIBLE_DEVICES"] = gpu_devices
-    # os.environ['MASTER_ADDR'] = '127.0.0.1'
-    # os.environ['MASTER_PORT'] = '5446'
-    # dist.init_process_group(backend='nccl',init_method='env://', world_size=world_size, rank=rank)
+    gpu_devices = ','.join([str(id) for id in world_size])
+    os.environ["CUDA_VISIBLE_DEVICES"] = gpu_devices
+    os.environ['MASTER_ADDR'] = '127.0.0.1'
+    os.environ['MASTER_PORT'] = '5446'
+    dist.init_process_group(backend='nccl',init_method='env://', world_size=world_size, rank=rank)
     
     # world_size (int, optional) – Number of processes participating in the job
     # init_method (str, optional) – URL specifying how to initialize the process group. Default is “env://” if no init_method or store is specified. Mutually exclusive with store.
@@ -121,7 +121,7 @@ if __name__ == "__main__":
     if distributed_mode:
         # sampler = DistributedSampler(training_data, num_replicas=world_size, rank=rank)
         if cuda:
-            model = DistributedDataParallel(model)
+            model = DataParallel(model)
         else:
             model = DistributedDataParallelCPU(model)
     
