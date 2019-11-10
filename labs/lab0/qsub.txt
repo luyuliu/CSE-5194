@@ -1,7 +1,23 @@
 qsub -I -l nodes=2:ppn=28 -l walltime=6:00:00 -A PAS1588
 
-qsub -I -l nodes=2:ppn=1:gpus=1 -l walltime=2:00:00 -A PAS1588
+qsub -I -l nodes=4:ppn=1:gpus=1 -l walltime=2:00:00 -A PAS1588
 module load python/3.6-conda5.2 
 
 cd CSE-5194/labs/lab2
 export OMP_NUM_THREADS=28
+
+
+python ./examples/run_glue.py \
+    --model_type bert \
+    --model_name_or_path bert-base-uncased \
+    --task_name aka2 \
+    --do_train \
+    --do_eval \
+    --do_lower_case \
+    --data_dir /users/PAS1588/liuluyu0378/example/datas/ \
+    --max_seq_length 128 \
+    --per_gpu_eval_batch_size=8   \
+    --per_gpu_train_batch_size=8   \
+    --learning_rate 2e-5 \
+    --num_train_epochs 3.0 \
+    --output_dir /users/PAS1588/liuluyu0378/example/datas/
