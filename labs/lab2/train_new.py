@@ -79,6 +79,7 @@ def train(gpu, args):
     optimizer = torch.optim.SGD(model.parameters(), 1e-4)
     # Wrap the model
     model = nn.parallel.DistributedDataParallel(model, device_ids=[gpu])
+    print("model transfered")
     
     optimizer = torch.optim.Adadelta(model.parameters())
     loss_fn = nn.NLLLoss()
@@ -97,13 +98,14 @@ def train(gpu, args):
 
     start = datetime.now()
     total_step = len(train_loader)
+
     print("loaded")
     for epoch in range(args.epochs):
         a = time.time()
         print('----epoch', epoch)
-        random.shuffle(data)
-        print(len(data))
-        for batch_ct, (X, Y) in enumerate(data):
+        # random.shuffle(data)
+        # print(len(data))
+        for batch_ct, (X, Y) in enumerate(train_loader):
             X = to_var(torch.LongTensor(X)) # (bs, seq_len)
             Y = to_var(torch.LongTensor(Y)) # (bs,)
             # print(X.size(), Y.size())
