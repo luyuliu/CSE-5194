@@ -497,9 +497,9 @@ dist_url = "tcp://172.31.22.234:23456"
 print("Initialize Process Group...")
 # Initialize Process Group
 # v1 - init with url
-dist.init_process_group(backend=dist_backend, init_method=dist_url, rank=int(sys.argv[1]), world_size=world_size)
+# dist.init_process_group(backend=dist_backend, init_method=dist_url, rank=int(sys.argv[1]), world_size=world_size)
 # v2 - init with file
-#dist.init_process_group(backend="nccl", init_method="file:///home/ubuntu/pt-distributed-tutorial/trainfile", rank=int(sys.argv[1]), world_size=world_size)
+dist.init_process_group(backend="nccl", init_method="file:///home/ubuntu/pt-distributed-tutorial/trainfile", rank=int(sys.argv[1]), world_size=world_size)
 
 # Establish Local Rank and set device on this node
 local_rank = int(sys.argv[2])
