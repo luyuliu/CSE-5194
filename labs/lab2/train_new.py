@@ -18,7 +18,6 @@ from torch.utils.data import DistributedSampler, DataLoader
 from torch.nn.parallel import DistributedDataParallelCPU, DistributedDataParallel
 import torch.multiprocessing as mp
 import torch.distributed as dist
-from utils.data_parallel import BalancedDataParallel
 
 vocab_size      = 2000
 seq_len         = 21
