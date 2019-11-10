@@ -79,6 +79,7 @@ def test(model, data):
 
 
 if __name__ == "__main__":
+    
     device = torch.device('cuda' if args.cuda else 'cpu')
     mp.set_start_method('spawn')
     distributed_mode = True

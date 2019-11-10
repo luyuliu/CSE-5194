@@ -33,9 +33,9 @@ rank            = 0
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-n', '--nodes', default=4, type=int, metavar='N',
+    parser.add_argument('-n', '--nodes', default=1, type=int, metavar='N',
                         help='number of data loading workers (default: 4)')
-    parser.add_argument('-g', '--gpus', default=1, type=int,
+    parser.add_argument('-g', '--gpus', default=2, type=int,
                         help='number of gpus per node')
     parser.add_argument('-nr', '--nr', default=0, type=int,
                         help='ranking within the nodes')
