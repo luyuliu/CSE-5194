@@ -79,9 +79,9 @@ def test(model, data):
 
 
 if __name__ == "__main__":
-    device = torch.device('cuda' if args.cuda else 'cpu')
-    mp.set_start_method('spawn')
-    distributed_mode = True
+    # device = torch.device('cuda' if args.cuda else 'cpu')
+    # mp.set_start_method('spawn')
+    # distributed_mode = True
     
     # gpu_devices = ','.join([str(id) for id in world_size])
     # os.environ["CUDA_VISIBLE_DEVICES"] = gpu_devices
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     
     # world_size (int, optional) – Number of processes participating in the job
     # init_method (str, optional) – URL specifying how to initialize the process group. Default is “env://” if no init_method or store is specified. Mutually exclusive with store.
-    setup()
+    # setup()
 
     words = read_words('/users/PAS1588/liuluyu0378/lab1/1-billion-word-language-modeling-benchmark-r13output/training-monolingual.tokenized.shuffled', seq_len, kernel[0])
     word_counter = collections.Counter(words).most_common(vocab_size-1)

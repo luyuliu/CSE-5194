@@ -15,6 +15,7 @@ def read_words(data_dir, seq_len, filter_h):
                 if len(tokens) == seq_len - 2:
                     # TODO i'm not sure about the padding...
                     words.extend((['<pad>']*int(filter_h/2)) + ['<s>'] + tokens + ['</s>'])
+            print(line)
 
     return words
 
