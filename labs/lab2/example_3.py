@@ -531,9 +531,10 @@ torch.cuda.set_device(local_rank)
 print("Initialize Model...")
 # Construct Model
 model = models.resnet18(pretrained=False).cuda()
+print("model")
 # Make model DistributedDataParallel
 model = torch.nn.parallel.DistributedDataParallel(model, device_ids=dp_device_ids, output_device=local_rank)
-
+print("model2")
 # define loss function (criterion) and optimizer
 criterion = nn.CrossEntropyLoss().cuda()
 optimizer = torch.optim.SGD(model.parameters(), starting_lr, momentum=0.9, weight_decay=1e-4)
