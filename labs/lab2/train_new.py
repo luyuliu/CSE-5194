@@ -15,7 +15,7 @@ from gated_cnn import GatedCNN
 
 import torch.nn.functional as F
 from torch.utils.data import DistributedSampler, DataLoader
-from torch.nn.parallel import DistributedDataParallelCPU, DistributedDataParallel
+from torch.nn.parallel import DistributedDataParallelCPU, DistributedDataParallel, DataParallel
 import torch.multiprocessing as mp
 import torch.distributed as dist
 
@@ -74,7 +74,6 @@ def train(gpu, args):
     
     torch.cuda.set_device(gpu)
     model.cuda(gpu)
-    batch_size = 100
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda(gpu)
     optimizer = torch.optim.SGD(model.parameters(), 1e-4)
