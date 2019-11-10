@@ -16,6 +16,7 @@ def read_words(data_dir, seq_len, filter_h):
                     # TODO i'm not sure about the padding...
                     words.extend((['<pad>']*int(filter_h/2)) + ['<s>'] + tokens + ['</s>'])
             # print(line)
+        break
 
     return words
 
