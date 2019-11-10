@@ -45,6 +45,7 @@ def main():
     os.environ['MASTER_ADDR'] = '127.0.0.1'
     os.environ['MASTER_PORT'] = '8888'
     print("starting")
+    mp.set_start_method('spawn')
     mp.spawn(train, nprocs=args.gpus, args=(args,))
     print("finished")
 
@@ -78,7 +79,7 @@ def train(gpu, args):
     criterion = nn.CrossEntropyLoss().cuda(gpu)
     optimizer = torch.optim.SGD(model.parameters(), 1e-4)
     # Wrap the model
-    model = nn.parallel.DistributedDataParallel(model, device_ids=[gpu])
+    model = nn.parallel.DataParallel(model, device_ids=[gpu])
     print("model transfered")
     
     optimizer = torch.optim.Adadelta(model.parameters())

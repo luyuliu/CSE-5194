@@ -7,9 +7,31 @@ cd CSE-5194/labs/lab2
 export OMP_NUM_THREADS=28
 
 
+
+    --train_data_file /users/PAS1588/liuluyu0378/example/datas/glue_data/MNLI/train.tsv \
+    --train_data_file /users/PAS1588/liuluyu0378/example/datas/train.tsv \
+    --train_data_file /users/PAS1588/liuluyu0378/example/datas/glue_data/CoLA/original/tokenized/in_domain_train.tsv \
+
 python run_lm_finetuning.py \
     --mlm \
-    --train_data_file /users/PAS1588/liuluyu0378/example/datas/glue_data/MNLI/original/multinli_1.0_train.txt \
+    --train_data_file /users/PAS1588/liuluyu0378/example/datas/train.tsv \
     --output_dir /users/PAS1588/liuluyu0378/example/datas/ \
     --overwrite_output_dir \
-    --do_train
+    --do_train \
+    --num_train_epochs 100
+
+python run_lm_finetuning.py \
+    --mlm \
+    --train_data_file /users/PAS1588/liuluyu0378/example/datas/glue_data/MNLI/train.tsv \
+    --output_dir /users/PAS1588/liuluyu0378/example/datas/ \
+    --overwrite_output_dir \
+    --do_train \
+    --num_train_epochs 100
+
+python run_lm_finetuning.py \
+    --mlm \
+    --train_data_file /users/PAS1588/liuluyu0378/example/datas/glue_data/CoLA/original/tokenized/in_domain_train.tsv \
+    --output_dir /users/PAS1588/liuluyu0378/example/datas/ \
+    --overwrite_output_dir \
+    --do_train \
+    --num_train_epochs 100
