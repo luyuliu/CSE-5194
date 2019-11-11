@@ -25,6 +25,7 @@ def main():
     os.environ['MASTER_PORT'] = '8888'
     print("starting")
     mp.spawn(train, nprocs=args.gpus, args=(args,))
+    mp.join()
     print("finished")
 
 class ConvNet(nn.Module):

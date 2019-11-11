@@ -14,19 +14,19 @@ export OMP_NUM_THREADS=28
 
 python run_lm_finetuning.py \
     --mlm \
-    --train_data_file /users/PAS1588/liuluyu0378/example/datas/train.tsv \
+    --train_data_file /users/PAS1588/liuluyu0378/example/datas/glue_data/MRPC/train.tsv \
     --output_dir /users/PAS1588/liuluyu0378/example/datas/ \
     --overwrite_output_dir \
     --do_train \
-    --num_train_epochs 100
+    --num_train_epochs 2
 
 python run_lm_finetuning.py \
     --mlm \
-    --train_data_file /users/PAS1588/liuluyu0378/example/datas/glue_data/MNLI/train.tsv \
+    --train_data_file /users/PAS1588/liuluyu0378/lab1/1-billion-word-language-modeling-benchmark-r13output/training-monolingual.tokenized.shuffled/news.en-00001-of-00100 \
     --output_dir /users/PAS1588/liuluyu0378/example/datas/ \
     --overwrite_output_dir \
     --do_train \
-    --num_train_epochs 100
+    --num_train_epochs 2
 
 python run_lm_finetuning.py \
     --mlm \
@@ -34,4 +34,6 @@ python run_lm_finetuning.py \
     --output_dir /users/PAS1588/liuluyu0378/example/datas/ \
     --overwrite_output_dir \
     --do_train \
-    --num_train_epochs 100
+    --num_train_epochs 2
+
+python run_lm_finetuning.py --mlm --train_data_file /users/PAS1588/liuluyu0378/example/datas/glue_data/CoLA/original/tokenized/in_domain_train.tsv --output_dir /users/PAS1588/liuluyu0378/example/datas/ --overwrite_output_dir --do_train --num_train_epochs 2
