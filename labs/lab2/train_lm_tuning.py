@@ -29,6 +29,7 @@ import pickle
 import random
 import re
 import shutil
+import time
 
 import numpy as np
 import torch
@@ -78,18 +79,24 @@ class TextDataset(Dataset):
             self.examples = []
             with open(file_path, encoding="utf-8") as f:
                 text = f.read()
+                
                 print("finish reading")
-
-            # tokenized_text = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(text))
-            tokenized_text = tokenizer.convert_tokens_to_ids(text)
+                # print((text))
+            
+            # afff = tokenizer.tokenize(text)
+            afff = text.split()
+            # print(afff)
+            # print(type(afff))
+            tokenized_text = tokenizer.convert_tokens_to_ids(afff)
+            # tokenized_text = tokenizer.convert_tokens_to_ids(text)
             print(len(text), type(text), len(tokenizer.tokenize(text)), type(tokenizer.tokenize(text)))
             print("finish tokenized")
 
             for i in range(0, len(tokenized_text)-block_size+1, block_size): # Truncate in block of block_size
                 self.examples.append(tokenizer.build_inputs_with_special_tokens(tokenized_text[i:i+block_size]))
-                if i % 100 == 20:
-                    print(((tokenized_text[i:i+block_size])))
-                    print(((text[i:i+block_size])))
+                # if i % 100 == 20:
+                    # print(((tokenized_text[i:i+block_size])))
+                    # print(((text[i:i+block_size])))
             # Note that we are loosing the last truncated example here for the sake of simplicity (no padding)
             # If your dataset is small, first you should loook for a bigger one :-) and second you
             # can change this behavior by adding (model specific) padding.
@@ -174,7 +181,6 @@ def train(args, train_dataset, model, tokenizer):
     """ Train the model """
     if args.local_rank in [-1, 0]:
         tb_writer = SummaryWriter()
-
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
     train_sampler = RandomSampler(train_dataset) if args.local_rank == -1 else DistributedSampler(train_dataset)
     train_dataloader = DataLoader(train_dataset, sampler=train_sampler, batch_size=args.train_batch_size)
@@ -200,16 +206,21 @@ def train(args, train_dataset, model, tokenizer):
             raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
         model, optimizer = amp.initialize(model, optimizer, opt_level=args.fp16_opt_level)
 
+
+    print("############# Start to create model ###################")
     # multi-gpu training (should be after apex fp16 initialization)
     if args.n_gpu > 1:
+        print("############# DataParallel ###################")
         model = torch.nn.DataParallel(model)
-
-    # Distributed training (should be after apex fp16 initialization)
-    if args.local_rank != -1:
-        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.local_rank],
-                                                          output_device=args.local_rank,
-                                                          find_unused_parameters=True)
-
+        
+        # Distributed training (should be after apex fp16 initialization)
+        if args.local_rank != -1:
+            print("############# DistributedDataParallel ###################")
+            model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.local_rank],
+                                                              output_device=args.local_rank,
+                                                              find_unused_parameters=True)
+    else:
+        print("############# Normal ###################")
     # Train!
     logger.info("***** Running training *****")
     logger.info("  Num examples = %d", len(train_dataset))
@@ -224,10 +235,15 @@ def train(args, train_dataset, model, tokenizer):
     tr_loss, logging_loss = 0.0, 0.0
     model.zero_grad()
     train_iterator = trange(int(args.num_train_epochs), desc="Epoch", disable=args.local_rank not in [-1, 0])
+    
     set_seed(args)  # Added here for reproducibility (even between python 2 and 3)
-    for _ in train_iterator:
+    for _ in range(int(args.num_train_epochs)):
+        
         epoch_iterator = tqdm(train_dataloader, desc="Iteration", disable=args.local_rank not in [-1, 0])
-        for step, batch in enumerate(epoch_iterator):
+        step_count = 0
+        aa = time.time()
+        for step, batch in enumerate(train_dataloader):
+            a = time.time()
             inputs, labels = mask_tokens(batch, tokenizer, args) if args.mlm else (batch, batch)
             inputs = inputs.to(args.device)
             labels = labels.to(args.device)
@@ -279,10 +295,15 @@ def train(args, train_dataset, model, tokenizer):
                     logger.info("Saving model checkpoint to %s", output_dir)
 
                     _rotate_checkpoints(args, checkpoint_prefix)
-
+            step_count+=1
             if args.max_steps > 0 and global_step > args.max_steps:
                 epoch_iterator.close()
                 break
+            b = time.time()
+            if step_count%100 == 20:
+                print("***** Training time: ", b-a, "; Step: ", step_count, "; loss: ", tr_loss/step_count, "*****")
+        bb = time.time()
+        print("***** Total Training time: ", bb-aa, "; Step: ", step_count, "; loss: ", tr_loss/step_count, "*****")
         if args.max_steps > 0 and global_step > args.max_steps:
             train_iterator.close()
             break
@@ -405,10 +426,12 @@ def main():
                         help="If > 0: set total number of training steps to perform. Override num_train_epochs.")
     parser.add_argument("--warmup_steps", default=0, type=int,
                         help="Linear warmup over warmup_steps.")
+    parser.add_argument("--cpu_node", type=int, default=2,
+                        help="How many CPU you want to use")
 
     parser.add_argument('--logging_steps', type=int, default=50,
                         help="Log every X updates steps.")
-    parser.add_argument('--save_steps', type=int, default=50,
+    parser.add_argument('--save_steps', type=int, default=500,
                         help="Save checkpoint every X updates steps.")
     parser.add_argument('--save_total_limit', type=int, default=None,
                         help='Limit the total amount of checkpoints, delete the older checkpoints in the output_dir, does not delete by default')
@@ -422,6 +445,8 @@ def main():
                         help="Overwrite the cached training and evaluation sets")
     parser.add_argument('--seed', type=int, default=42,
                         help="random seed for initialization")
+    parser.add_argument('--world_size', type=int, default=2,
+                        help="world_size")
 
     parser.add_argument('--fp16', action='store_true',
                         help="Whether to use 16-bit (mixed) precision (through NVIDIA apex) instead of 32-bit")
@@ -459,7 +484,15 @@ def main():
     else:  # Initializes the distributed backend which will take care of sychronizing nodes/GPUs
         torch.cuda.set_device(args.local_rank)
         device = torch.device("cuda", args.local_rank)
+        print("$$$$$$$$$$$$$$$$$$$$", device , "$$$$$$$$$$$$$$$$$$$$")
+        
+        os.environ['MASTER_ADDR'] = '127.0.0.1'
+        os.environ['MASTER_PORT'] = '29502'
+        os.environ['WORLD_SIZE'] = str(args.world_size)
+        os.environ['RANK'] = '0'
+        # , rank = args.local_rank, world_size = args.world_size
         torch.distributed.init_process_group(backend='nccl')
+        print("$$$$$$$$$$$$$$$$$$$$", "init done." , "$$$$$$$$$$$$$$$$$$$$")
         args.n_gpu = 1
     args.device = device
 
@@ -477,6 +510,7 @@ def main():
     if args.local_rank not in [-1, 0]:
         torch.distributed.barrier()  # Barrier to make sure only the first process in distributed training download model & vocab
 
+    print("pass the barrier")
     config_class, model_class, tokenizer_class = MODEL_CLASSES[args.model_type]
     config = config_class.from_pretrained(args.config_name if args.config_name else args.model_name_or_path,
                                           cache_dir=args.cache_dir if args.cache_dir else None)
