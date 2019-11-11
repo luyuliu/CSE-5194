@@ -3,10 +3,8 @@ qsub -I -l nodes=4:ppn=28 -l walltime=2:00:00 -A PAS1588
 qsub -I -l nodes=2:ppn=1:gpus=1 -l walltime=2:00:00 -A PAS1588
 
 module load python/3.6-conda5.2 
-
-cd CSE-5194/labs/lab2
-
 cd /users/PAS1588/liuluyu0378/example/transformers/examples
+cd CSE-5194/labs/lab2
 
 export OMP_NUM_THREADS=28
 
@@ -32,7 +30,7 @@ python run_lm_finetuning.py \
     --do_train \
     --num_train_epochs 1 \
     --per_gpu_train_batch_size 4 \
-    --local_rank 1 \
+    --local_rank 0 \
     --world_size 2
 
 
