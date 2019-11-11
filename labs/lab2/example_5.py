@@ -2,10 +2,12 @@ import os
 import torch
 import torch.distributed as dist
 from torch.multiprocessing import Process
+import socket
 
 def run(rank, size):
     """ Distributed function to be implemented later. """
     print("???")
+    print(socket.gethostname())
     pass
 
 def init_processes(rank, size, fn, backend='nccl'):
