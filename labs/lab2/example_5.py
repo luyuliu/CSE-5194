@@ -8,7 +8,7 @@ def run(rank, size):
     print("???")
     pass
 
-def init_processes(rank, size, fn, backend='tcp'):
+def init_processes(rank, size, fn, backend='nccl'):
     """ Initialize the distributed environment. """
     os.environ['MASTER_ADDR'] = '127.0.0.1'
     os.environ['MASTER_PORT'] = '29500'
