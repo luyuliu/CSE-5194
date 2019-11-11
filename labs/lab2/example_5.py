@@ -10,7 +10,7 @@ def run(rank, size):
     print(socket.gethostname())
     pass
 
-def init_processes(rank, size, fn, backend='nccl'):
+def init_processes(rank, size, fn, backend='gloo'):
     """ Initialize the distributed environment. """
     os.environ['MASTER_ADDR'] = '127.0.0.1'
     os.environ['MASTER_PORT'] = '29500'
