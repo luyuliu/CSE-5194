@@ -44,6 +44,18 @@ parser.add_argument('--fp16-allreduce', action='store_true', default=False,
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 
+
+vocab_size      = 2000
+seq_len         = 21
+embd_size       = 200
+n_layers        = 10
+kernel          = (5, embd_size)
+out_chs         = 64
+res_block_count = 5
+batch_size      = 80
+rank            = 0
+world_size      = 2
+
 # Horovod: initialize library.
 hvd.init()
 torch.manual_seed(args.seed)
