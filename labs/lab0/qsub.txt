@@ -51,8 +51,8 @@ python run_lm_finetuning.py --mlm --train_data_file /users/PAS1588/liuluyu0378/e
 python run_lm_finetuning.py --mlm --train_data_file /users/PAS1588/liuluyu0378/lab1/1-billion-word-language-modeling-benchmark-r13output/training-monolingual.tokenized.shuffled/news.en-00001-of-00100 --output_dir /users/PAS1588/liuluyu0378/example/datas/ --overwrite_output_dir --do_train --do_eval --eval_data_file /users/PAS1588/liuluyu0378/lab1/1-billion-word-language-modeling-benchmark-r13output/training-monolingual.tokenized.shuffled/news.en-00002-of-00100 --num_train_epochs 2 --evaluate_during_training
 
 
-source $PATH_TO_MINICONDA/bin/activate
-conda create -n pytorch_horovod python=2.7.15 (creating conda environment. you can use python 3.6.5 also).
+source /users/PAS1588/liuluyu0378/example/miniconda/bin/activate
+conda create -n pytorch_horovod python=3.6.5 (creating conda environment. you can use python 3.6.5 also).
 export PYTHONNOUSERSITE=true
 conda activate pytorch_horovod 
 pip install torch torchvision
