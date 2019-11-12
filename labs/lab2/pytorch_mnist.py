@@ -7,6 +7,20 @@ from torchvision import datasets, transforms
 import torch.utils.data.distributed
 import horovod.torch as hvd
 
+import collections
+import random, time, os
+
+import torch
+
+from utils import read_words, create_batches, to_var
+from gated_cnn import GatedCNN
+
+import torch.nn.functional as F
+from torch.utils.data import DistributedSampler, DataLoader
+from torch.nn.parallel import DistributedDataParallelCPU, DistributedDataParallel, DataParallel
+import torch.multiprocessing as mp
+import torch.distributed as dist
+
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
 parser.add_argument('--batch-size', type=int, default=64, metavar='N',
@@ -44,23 +58,31 @@ if args.cuda:
 torch.set_num_threads(1)
 
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
-train_dataset = \
-    datasets.MNIST('data-%d' % hvd.rank(), train=True, download=True,
-                   transform=transforms.Compose([
-                       transforms.ToTensor(),
-                       transforms.Normalize((0.1307,), (0.3081,))
-                   ]))
+
+words = read_words('/users/PAS1588/liuluyu0378/lab1/1-billion-word-language-modeling-benchmark-r13output/training-monolingual.tokenized.shuffled', seq_len, kernel[0])
+word_counter = collections.Counter(words).most_common(vocab_size-1)
+vocab = [w for w, _ in word_counter]
+w2i = dict((w, i) for i, w in enumerate(vocab, 1))
+w2i['<unk>'] = 0
+print('vocab_size', vocab_size)
+print('w2i size', len(w2i))
+
+data = [w2i[w] if w in w2i else 0 for w in words]
+data = create_batches(data, batch_size, seq_len)
+split_idx = int(len(data) * 0.8)
+training_data = data[:split_idx]
+test_data = data[split_idx:]
+print('train samples:', len(training_data))
+print('test samples:', len(test_data))
+
+train_dataset = training_data
 # Horovod: use DistributedSampler to partition the training data.
 train_sampler = torch.utils.data.distributed.DistributedSampler(
     train_dataset, num_replicas=hvd.size(), rank=hvd.rank())
 train_loader = torch.utils.data.DataLoader(
     train_dataset, batch_size=args.batch_size, sampler=train_sampler, **kwargs)
 
-test_dataset = \
-    datasets.MNIST('data-%d' % hvd.rank(), train=False, transform=transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.1307,), (0.3081,))
-    ]))
+test_dataset = test_data
 # Horovod: use DistributedSampler to partition the test data.
 test_sampler = torch.utils.data.distributed.DistributedSampler(
     test_dataset, num_replicas=hvd.size(), rank=hvd.rank())
@@ -69,22 +91,71 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.test_bat
 
 
 class Net(nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(1, 10, kernel_size=5)
-        self.conv2 = nn.Conv2d(10, 20, kernel_size=5)
-        self.conv2_drop = nn.Dropout2d()
-        self.fc1 = nn.Linear(320, 50)
-        self.fc2 = nn.Linear(50, 10)
+    '''
+        In : (N, sentence_len)
+        Out: (N, sentence_len, embd_size)
+    '''
+    def __init__(self,
+                 seq_len,
+                 vocab_size,
+                 embd_size,
+                 n_layers,
+                 kernel,
+                 out_chs,
+                 res_block_count,
+                 ans_size):
+        super(GatedCNN, self).__init__()
+        self.res_block_count = res_block_count
+        # self.embd_size = embd_size
+
+        self.embedding = nn.Embedding(vocab_size, embd_size)
+
+        # nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0, ...
+        self.conv_0 = nn.Conv2d(1, out_chs, kernel, padding=(2, 0))
+        self.b_0 = nn.Parameter(torch.randn(1, out_chs, 1, 1))
+        self.conv_gate_0 = nn.Conv2d(1, out_chs, kernel, padding=(2, 0))
+        self.c_0 = nn.Parameter(torch.randn(1, out_chs, 1, 1))
+
+        self.conv = nn.ModuleList([nn.Conv2d(out_chs, out_chs, (kernel[0], 1), padding=(2, 0)) for _ in range(n_layers)])
+        self.conv_gate = nn.ModuleList([nn.Conv2d(out_chs, out_chs, (kernel[0], 1), padding=(2, 0)) for _ in range(n_layers)])
+        self.b = nn.ParameterList([nn.Parameter(torch.randn(1, out_chs, 1, 1)) for _ in range(n_layers)])
+        self.c = nn.ParameterList([nn.Parameter(torch.randn(1, out_chs, 1, 1)) for _ in range(n_layers)])
+
+        self.fc = nn.Linear(out_chs*seq_len, ans_size)
 
     def forward(self, x):
-        x = F.relu(F.max_pool2d(self.conv1(x), 2))
-        x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
-        x = x.view(-1, 320)
-        x = F.relu(self.fc1(x))
-        x = F.dropout(x, training=self.training)
-        x = self.fc2(x)
-        return F.log_softmax(x)
+        # x: (N, seq_len)
+
+        # Embedding
+        bs = x.size(0) # batch size
+        seq_len = x.size(1)
+        x = self.embedding(x) # (bs, seq_len, embd_size)
+
+        # CNN
+        x = x.unsqueeze(1) # (bs, Cin, seq_len, embd_size), insert Channnel-In dim
+        # Conv2d
+        #    Input : (bs, Cin,  Hin,  Win )
+        #    Output: (bs, Cout, Hout, Wout)
+        A = self.conv_0(x)      # (bs, Cout, seq_len, 1)
+        A += self.b_0.repeat(1, 1, seq_len, 1)
+        B = self.conv_gate_0(x) # (bs, Cout, seq_len, 1)
+        B += self.c_0.repeat(1, 1, seq_len, 1)
+        h = A * F.sigmoid(B)    # (bs, Cout, seq_len, 1)
+        res_input = h # TODO this is h1 not h0
+
+        for i, (conv, conv_gate) in enumerate(zip(self.conv, self.conv_gate)):
+            A = conv(h) + self.b[i].repeat(1, 1, seq_len, 1)
+            B = conv_gate(h) + self.c[i].repeat(1, 1, seq_len, 1)
+            h = A * F.sigmoid(B) # (bs, Cout, seq_len, 1)
+            if i % self.res_block_count == 0: # size of each residual block
+                h += res_input
+                res_input = h
+
+        h = h.view(bs, -1) # (bs, Cout*seq_len)
+        out = self.fc(h) # (bs, ans_size)
+        out = F.log_softmax(out)
+
+        return out
 
 
 model = Net()
