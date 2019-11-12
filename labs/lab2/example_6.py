@@ -120,7 +120,6 @@ def train(epoch):
         if args.cuda:
             data, target = data.cuda(), target.cuda()
         print(type(data))
-        a = bbbb
         optimizer.zero_grad()
         output = model(data)
         loss = F.nll_loss(output, target)
@@ -168,7 +167,10 @@ def test():
         print('\nTest set: Average loss: {:.4f}, Accuracy: {:.2f}%\n'.format(
             test_loss, 100. * test_accuracy))
 
-
+aaa = time.time()
 for epoch in range(1, args.epochs + 1):
     train(epoch)
     test()
+bbb = time.time()
+
+print("************* Total train time: ", bbb - aaa, "***************")

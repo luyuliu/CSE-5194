@@ -1,0 +1,12 @@
+qsub -I -l nodes=2:ppn=1:gpus=1 -l walltime=2:00:00 -A PAS1588
+
+qsub -I -l nodes=2:ppn=28 -l walltime=2:00:00 -A PAS1588
+
+source /users/PAS1588/liuluyu0378/example/miniconda/bin/activate
+export PYTHONNOUSERSITE=true
+conda activate pytorch3
+module load cuda/10.0.130
+cd CSE-5194/labs/lab2
+python train_hvd.py
+
+
