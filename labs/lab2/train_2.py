@@ -40,11 +40,14 @@ def train(model, data, test_data, optimizer, loss_fn, n_epoch=5):
         random.shuffle(data)
         print(len(data))
         for batch_ct, (X, Y) in enumerate(data):
+            print(X)
+            break
             X = to_var(torch.LongTensor(X)) # (bs, seq_len)
             Y = to_var(torch.LongTensor(Y)) # (bs,)
             # print(X.size(), Y.size())
             # print(X)
             # print(batch_ct, X.size(), Y.size())
+            
             pred = model(X) # (bs, ans_size)
             # _, pred_ids = torch.max(pred, 1)
             loss = loss_fn(pred, Y)
@@ -80,15 +83,15 @@ def test(model, data):
 
 if __name__ == "__main__":
     
-    device = torch.device('cuda' if args.cuda else 'cpu')
-    mp.set_start_method('spawn')
-    distributed_mode = True
+    # device = torch.device('cuda' if args.cuda else 'cpu')
+    # mp.set_start_method('spawn')
+    # distributed_mode = True
     
-    gpu_devices = ','.join([str(id) for id in world_size])
-    os.environ["CUDA_VISIBLE_DEVICES"] = gpu_devices
-    os.environ['MASTER_ADDR'] = '127.0.0.1'
-    os.environ['MASTER_PORT'] = '5446'
-    dist.init_process_group(backend='nccl',init_method='env://', world_size=world_size, rank=rank)
+    # gpu_devices = ','.join([str(id) for id in world_size])
+    # os.environ["CUDA_VISIBLE_DEVICES"] = gpu_devices
+    # os.environ['MASTER_ADDR'] = '127.0.0.1'
+    # os.environ['MASTER_PORT'] = '5446'
+    # dist.init_process_group(backend='nccl',init_method='env://', world_size=world_size, rank=rank)
     
     # world_size (int, optional) – Number of processes participating in the job
     # init_method (str, optional) – URL specifying how to initialize the process group. Default is “env://” if no init_method or store is specified. Mutually exclusive with store.
@@ -119,6 +122,7 @@ if __name__ == "__main__":
     else:
         cuda = False
 
+    distributed_mode = False
     if distributed_mode:
         # sampler = DistributedSampler(training_data, num_replicas=world_size, rank=rank)
         if cuda:

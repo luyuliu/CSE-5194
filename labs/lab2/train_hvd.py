@@ -24,12 +24,12 @@ from gated_cnn import GatedCNN
 
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
-parser.add_argument('--batch-size', type=int, default=64, metavar='N',
+parser.add_argument('--batch-size', type=int, default=80, metavar='N',
                     help='input batch size for training (default: 64)')
 parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
                     help='input batch size for testing (default: 1000)')
-parser.add_argument('--epochs', type=int, default=10, metavar='N',
-                    help='number of epochs to train (default: 10)')
+parser.add_argument('--epochs', type=int, default=1, metavar='N',
+                    help='number of epochs to train (default: 1)')
 parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
                     help='learning rate (default: 0.01)')
 parser.add_argument('--momentum', type=float, default=0.5, metavar='M',
@@ -38,7 +38,7 @@ parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='disables CUDA training')
 parser.add_argument('--seed', type=int, default=42, metavar='S',
                     help='random seed (default: 42)')
-parser.add_argument('--log-interval', type=int, default=10, metavar='N',
+parser.add_argument('--log-interval', type=int, default=1000, metavar='N',
                     help='how many batches to wait before logging training status')
 parser.add_argument('--fp16-allreduce', action='store_true', default=False,
                     help='use fp16 compression during allreduce')
@@ -130,28 +130,36 @@ def train(epoch):
     model.train()
     # Horovod: set epoch to sampler for shuffling.
     train_sampler.set_epoch(epoch)
-    for batch_idx, (data, target) in enumerate(train_loader):
-        for i in range(len(data)):
-            data[i] = torch.stack(data[i])
+    aa = time.time()
+    for batch_idx, (data, target) in enumerate(train_dataset):
+        a = time.time()
+        # for i in range(len(data)):
+        #     print(len(data[0][0]))
+        #     data[i] = to_var(torch.stack(data[i]))
             
-        data = torch.stack(data)
-        
-        
-        target = torch.stack(target)
-        print(target.size(), data.size())
+            
+        # data = torch.stack(data)
+        # target = torch.stack(target)
+        data = to_var(torch.LongTensor(data)) # (bs, seq_len)
+        target = to_var(torch.LongTensor(target)) # (bs,)
+        # print( data.size(), target.size())
         if args.cuda:
             data, target = data.cuda(), target.cuda()
-        optimizer.zero_grad()
         output = model(data)
         loss = F.nll_loss(output, target)
+        optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+        b = time.time()
         if batch_idx % args.log_interval == 0:
             # Horovod: use train_sampler to determine the number of examples in
             # this worker's partition.
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_idx * len(data), len(train_sampler),
-                100. * batch_idx / len(train_loader), loss.item()))
+                epoch, batch_idx * len(data), len(train_dataset),
+                100. * batch_idx / len(train_dataset), loss.item()))
+            print("Train time: ", b -a)
+    bb = time.time()
+    print("************* Total train time: ", bb - aa, "***************")
 
 
 def metric_average(val, name):
@@ -164,20 +172,32 @@ def test():
     model.eval()
     test_loss = 0.
     test_accuracy = 0.
-    for data, target in test_loader:
+    counter = 0
+    correct = 0
+    for data, target in test_dataset:
+        
+        data = to_var(torch.LongTensor(data)) # (bs, seq_len)
+        target = to_var(torch.LongTensor(target)) # (bs,)
         if args.cuda:
             data, target = data.cuda(), target.cuda()
         output = model(data)
         # sum up batch loss
-        test_loss += F.nll_loss(output, target, size_average=False).item()
+        test_loss += F.nll_loss(output, target).item()
+        _, pred_ids = torch.max(output, 1)
         # get the index of the max log-probability
         pred = output.data.max(1, keepdim=True)[1]
+        correct += torch.sum(pred_ids == target).data.item()
+        
+        counter += data.size(0)
         test_accuracy += pred.eq(target.data.view_as(pred)).cpu().float().sum()
+        
+    # print('Test Acc: {:.2f} % ({}/{})'.format(100 * correct / counter, correct, counter))
+    # print('Test Loss: {:.4f}'.format(losses/counter))
 
-    # Horovod: use test_sampler to determine the number of examples in
-    # this worker's partition.
-    test_loss /= len(test_sampler)
-    test_accuracy /= len(test_sampler)
+    # # Horovod: use test_sampler to determine the number of examples in
+    # # this worker's partition.
+    test_loss /= counter
+    test_accuracy /= counter
 
     # Horovod: average metric values across workers.
     test_loss = metric_average(test_loss, 'avg_loss')

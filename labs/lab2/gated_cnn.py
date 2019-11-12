@@ -17,6 +17,7 @@ class GatedCNN(nn.Module):
                  out_chs,
                  res_block_count,
                  ans_size):
+        
         super(GatedCNN, self).__init__()
         self.res_block_count = res_block_count
         # self.embd_size = embd_size
@@ -24,9 +25,9 @@ class GatedCNN(nn.Module):
         self.embedding = nn.Embedding(vocab_size, embd_size)
 
         # nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0, ...
-        self.conv_0 = nn.Conv2d(1, out_chs, kernel, padding=(2, 0))
+        self.conv_0 = nn.Conv2d(1, out_chs, kernel_size=kernel, padding=(2, 0))
         self.b_0 = nn.Parameter(torch.randn(1, out_chs, 1, 1))
-        self.conv_gate_0 = nn.Conv2d(1, out_chs, kernel, padding=(2, 0))
+        self.conv_gate_0 = nn.Conv2d(1, out_chs, kernel_size=kernel, padding=(2, 0))
         self.c_0 = nn.Parameter(torch.randn(1, out_chs, 1, 1))
 
         self.conv = nn.ModuleList([nn.Conv2d(out_chs, out_chs, (kernel[0], 1), padding=(2, 0)) for _ in range(n_layers)])
@@ -46,6 +47,7 @@ class GatedCNN(nn.Module):
 
         # CNN
         x = x.unsqueeze(1) # (bs, Cin, seq_len, embd_size), insert Channnel-In dim
+        # print(x.size())
         # Conv2d
         #    Input : (bs, Cin,  Hin,  Win )
         #    Output: (bs, Cout, Hout, Wout)
