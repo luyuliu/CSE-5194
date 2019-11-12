@@ -170,7 +170,7 @@ class Net(nn.Module):
         return out
 
 
-model = Net()
+model = Net(seq_len, vocab_size, embd_size, n_layers, kernel, out_chs, res_block_count, vocab_size)
 
 if args.cuda:
     # Move model to GPU.
