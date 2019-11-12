@@ -131,8 +131,16 @@ def train(epoch):
     # Horovod: set epoch to sampler for shuffling.
     train_sampler.set_epoch(epoch)
     for batch_idx, (data, target) in enumerate(train_loader):
-        # if args.cuda:
-        #     data, target = data.cuda(), target.cuda()
+        for i in range(len(data)):
+            data[i] = torch.stack(data[i])
+            
+        data = torch.stack(data)
+        
+        
+        target = torch.stack(target)
+        print(target.size(), data.size())
+        if args.cuda:
+            data, target = data.cuda(), target.cuda()
         optimizer.zero_grad()
         output = model(data)
         loss = F.nll_loss(output, target)

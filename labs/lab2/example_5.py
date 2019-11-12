@@ -6,7 +6,7 @@ import socket
 
 def run(rank, size):
     """ Distributed function to be implemented later. """
-    print("???")
+    print("???", rank, size)
     print(socket.gethostname())
     pass
 

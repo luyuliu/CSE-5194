@@ -50,6 +50,7 @@ train_dataset = \
                        transforms.ToTensor(),
                        transforms.Normalize((0.1307,), (0.3081,))
                    ]))
+print(type(train_dataset))
 # Horovod: use DistributedSampler to partition the training data.
 train_sampler = torch.utils.data.distributed.DistributedSampler(
     train_dataset, num_replicas=hvd.size(), rank=hvd.rank())
@@ -115,9 +116,11 @@ def train(epoch):
     # Horovod: set epoch to sampler for shuffling.
     train_sampler.set_epoch(epoch)
     for batch_idx, (data, target) in enumerate(train_loader):
-        print(type(data), type(data.cuda()))
+        print(type(data[0][0]), type(data[0]), type(data))
         if args.cuda:
             data, target = data.cuda(), target.cuda()
+        print(type(data))
+        a = bbbb
         optimizer.zero_grad()
         output = model(data)
         loss = F.nll_loss(output, target)
