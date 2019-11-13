@@ -489,6 +489,7 @@ def main():
         # Horovod: pin GPU to local rank.
         torch.cuda.set_device(hvd.local_rank())
         torch.cuda.manual_seed(args.seed)
+    args.n_gpu = 1
 
 
     if args.model_type in ["bert", "roberta", "distilbert"] and not args.mlm:
