@@ -36,8 +36,8 @@ import torch
 from torch.utils.data import DataLoader, Dataset, SequentialSampler, RandomSampler
 from torch.utils.data.distributed import DistributedSampler
 
-import hovorod
-import hovorod.torch as hvd
+import horovod
+import horovod.torch as hvd
 
 try:
     from torch.utils.tensorboard import SummaryWriter
