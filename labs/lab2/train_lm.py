@@ -542,8 +542,8 @@ def main():
     set_seed(args)
 
     # Load pretrained model and tokenizer
-    if args.local_rank not in [-1, 0]:
-        torch.distributed.barrier()  # Barrier to make sure only the first process in distributed training download model & vocab
+    # if args.local_rank not in [-1, 0]:
+    #     torch.distributed.barrier()  # Barrier to make sure only the first process in distributed training download model & vocab
 
     print("pass the barrier")
     config_class, model_class, tokenizer_class = MODEL_CLASSES[args.model_type]
@@ -561,20 +561,20 @@ def main():
                                         cache_dir=args.cache_dir if args.cache_dir else None)
     # model.to(args.device)
 
-    if args.local_rank == 0:
-        torch.distributed.barrier()  # End of barrier to make sure only the first process in distributed training download model & vocab
+    # if args.local_rank == 0:
+    #     torch.distributed.barrier()  # End of barrier to make sure only the first process in distributed training download model & vocab
 
     logger.info("Training/evaluation parameters %s", args)
 
     # Training
     if args.do_train:
-        if args.local_rank not in [-1, 0]:
-            torch.distributed.barrier()  # Barrier to make sure only the first process in distributed training process the dataset, and the others will use the cache
+        # if args.local_rank not in [-1, 0]:
+        #     torch.distributed.barrier()  # Barrier to make sure only the first process in distributed training process the dataset, and the others will use the cache
 
         train_dataset = load_and_cache_examples(args, tokenizer, evaluate=False)
 
-        if args.local_rank == 0:
-            torch.distributed.barrier()
+        # if args.local_rank == 0:
+        #     torch.distributed.barrier()
 
         global_step, tr_loss = train(args, train_dataset, model, tokenizer)
         logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
