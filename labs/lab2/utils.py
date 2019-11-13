@@ -1,7 +1,7 @@
 import os
 import torch
 from torch.autograd import Variable
-
+from io import open
 
 def read_words(data_dir, seq_len, filter_h):
     words = []
@@ -16,7 +16,7 @@ def read_words(data_dir, seq_len, filter_h):
                     # TODO i'm not sure about the padding...
                     words.extend((['<pad>']*int(filter_h/2)) + ['<s>'] + tokens + ['</s>'])
             # print(line)
-        # break
+        break
 
     return words
 
