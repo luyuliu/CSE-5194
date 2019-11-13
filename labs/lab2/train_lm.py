@@ -30,6 +30,7 @@ import random
 import re
 import shutil
 import time
+import open from os
 
 import numpy as np
 import torch
@@ -539,7 +540,7 @@ def main():
     #                 args.local_rank, device, args.n_gpu, bool(args.local_rank != -1), args.fp16)
 
     # Set seed
-    set_seed(args)
+    # set_seed(args)
 
     # Load pretrained model and tokenizer
     # if args.local_rank not in [-1, 0]:
@@ -575,6 +576,8 @@ def main():
 
         # if args.local_rank == 0:
         #     torch.distributed.barrier()
+
+        print("Training")
 
         global_step, tr_loss = train(args, train_dataset, model, tokenizer)
         logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
