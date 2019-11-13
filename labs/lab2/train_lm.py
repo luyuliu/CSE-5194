@@ -390,9 +390,9 @@ def main():
     parser = argparse.ArgumentParser()
 
     ## Required parameters
-    parser.add_argument("--train_data_file", default=None, type=str, required=True,
+    parser.add_argument("--train_data_file", default="/users/PAS1588/liuluyu0378/lab1/1-billion-word-language-modeling-benchmark-r13output/training-monolingual.tokenized.shuffled/news.en-00001-of-00100", type=str, 
                         help="The input training data file (a text file).")
-    parser.add_argument("--output_dir", default=None, type=str, required=True,
+    parser.add_argument("--output_dir", default="/users/PAS1588/liuluyu0378/example/datas/", type=str, 
                         help="The output directory where the model predictions and checkpoints will be written.")
 
     ## Other parameters
