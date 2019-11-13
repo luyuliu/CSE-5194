@@ -188,7 +188,7 @@ def train(args, train_dataset, model, tokenizer):
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
     # kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
     
-    train_sampler = RandomSampler(train_dataset) if args.local_rank == -1 else DistributedSampler(train_dataset)
+    train_sampler = RandomSampler(train_dataset) if args.local_rank == -1 else DistributedSampler(train_dataset, num_replicas=hvd.size(), rank=hvd.rank())
     train_dataloader = DataLoader(train_dataset, sampler=train_sampler, batch_size=args.train_batch_size, num_workers = 1, pin_memory = True)
 
     if args.max_steps > 0:
