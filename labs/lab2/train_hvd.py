@@ -85,6 +85,14 @@ data = create_batches(data, batch_size, seq_len)
 split_idx = int(len(data) * 0.8)
 training_data = data[:split_idx]
 test_data = data[split_idx:]
+
+rank = hvd.rank()
+training_length = len(training_data)
+test_length = len(test_data)
+training_data = training_data[int(rank * training_length / hvd.size()): int((rank + 1)* training_length / hvd.size())]
+test_data = test_data[int(rank * test_length / hvd.size()): int((rank + 1)* test_length / hvd.size())]
+
+
 print('train samples:', len(training_data))
 print('test samples:', len(test_data))
 
@@ -130,7 +138,6 @@ def train(epoch):
     model.train()
     # Horovod: set epoch to sampler for shuffling.
     train_sampler.set_epoch(epoch)
-    aa = time.time()
     for batch_idx, (data, target) in enumerate(train_dataset):
         a = time.time()
         # for i in range(len(data)):
@@ -140,6 +147,7 @@ def train(epoch):
             
         # data = torch.stack(data)
         # target = torch.stack(target)
+        
         data = to_var(torch.LongTensor(data)) # (bs, seq_len)
         target = to_var(torch.LongTensor(target)) # (bs,)
         # print( data.size(), target.size())
@@ -154,12 +162,12 @@ def train(epoch):
         if batch_idx % args.log_interval == 0:
             # Horovod: use train_sampler to determine the number of examples in
             # this worker's partition.
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_idx * len(data), len(train_dataset),
-                100. * batch_idx / len(train_dataset), loss.item()))
-            print("Train time: ", b -a)
-    bb = time.time()
-    print("************* Total train time: ", bb - aa, "***************")
+            if hvd.rank() == 0:
+                print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                    epoch, batch_idx * len(data), len(train_dataset),
+                    100. * batch_idx / len(train_dataset), loss.item()))
+                print("Train time: ", b -a)
+    
 
 
 def metric_average(val, name):
@@ -210,5 +218,8 @@ def test():
 
 
 for epoch in range(1, args.epochs + 1):
+    aa = time.time()
     train(epoch)
+    bb = time.time()
+    print("************* Total train time: ", bb - aa, "***************")
     test()

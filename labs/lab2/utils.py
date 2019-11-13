@@ -5,6 +5,7 @@ from io import open
 
 def read_words(data_dir, seq_len, filter_h):
     words = []
+    count = 0
     for file in os.listdir(data_dir):
         print('Load', file)
         with open(os.path.join(data_dir, file), 'r', encoding="utf8") as f:
@@ -16,7 +17,9 @@ def read_words(data_dir, seq_len, filter_h):
                     # TODO i'm not sure about the padding...
                     words.extend((['<pad>']*int(filter_h/2)) + ['<s>'] + tokens + ['</s>'])
             # print(line)
-        break
+        count += 1
+        # if count == 5:
+        #     break
 
     return words
 
