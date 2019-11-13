@@ -485,7 +485,6 @@ def main():
     torch.manual_seed(args.seed)
     torch.set_num_threads(1)
 
-    kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
 
     if args.model_type in ["bert", "roberta", "distilbert"] and not args.mlm:
         raise ValueError("BERT and RoBERTa do not have LM heads but masked LM heads. They must be run using the --mlm "
