@@ -56,10 +56,11 @@ conda create -n pytorch_horovod python=3.6.5 (creating conda environment. you ca
 export PYTHONNOUSERSITE=true
 conda activate pytorch3
 pip install torch torchvision
-
 module load mvapich2/2.3.1-gpu 
-
 module load cuda/10.0.130
+HOROVOD_GPU_ALLREDUCE=MPI pip install --no-cache-dir  horovod==0.16.4
+
+
 export HOROVOD_CUDA_HOME=/usr/local/cuda/10.0.130
 export HOROVOD_CUDA_HOME=/apps/cuda/10.0.130/
 HOROVOD_GPU_ALLREDUCE=MPI pip install --no-cache-dir  horovod==0.16.4
