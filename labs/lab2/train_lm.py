@@ -30,7 +30,7 @@ import random
 import re
 import shutil
 import time
-import open from os
+import os.open as open
 
 import numpy as np
 import torch
