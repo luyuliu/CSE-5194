@@ -138,6 +138,13 @@ def train(epoch):
     model.train()
     # Horovod: set epoch to sampler for shuffling.
     train_sampler.set_epoch(epoch)
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 457745103834e699f8b39c101f61a5912ad9bb65
+=======
+>>>>>>> 2fc953585ee0c5debe4c0b8d20434fbacc053cf3
     for batch_idx, (data, target) in enumerate(train_dataset):
         a = time.time()
         # for i in range(len(data)):
