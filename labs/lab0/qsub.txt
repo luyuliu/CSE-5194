@@ -63,5 +63,5 @@ HOROVOD_GPU_ALLREDUCE=MPI pip install --no-cache-dir  horovod==0.16.4
 
 export HOROVOD_CUDA_HOME=/usr/local/cuda/10.0.130
 export HOROVOD_CUDA_HOME=/apps/cuda/10.0.130/
-HOROVOD_GPU_ALLREDUCE=MPI pip install --no-cache-dir  horovod==0.16.4
+pip install --no-cache-dir  horovod==0.16.4
 

@@ -268,6 +268,7 @@ def train(args, train_dataset, model, tokenizer):
         for step, batch in enumerate(train_dataloader):
             a = time.time()
             inputs, labels = mask_tokens(batch, tokenizer, args) if args.mlm else (batch, batch)
+            inputs, labels = inputs.cuda(), labels.cuda()
             # inputs = inputs.to(args.device)
             # labels = labels.to(args.device)
             model.train()
