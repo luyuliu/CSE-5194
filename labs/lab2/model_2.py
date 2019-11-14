@@ -31,7 +31,7 @@ class SomeNet(nn.Module):
 
         self.lstm = nn.LSTM(embd_size, self.hidden_dim // 2 , n_layers, dropout=self.dropout, bidirectional=True)
 
-        self.output = nn.Linear(out_chs*seq_len, ans_size)
+        self.output = nn.Linear(self.hidden_dim, ans_size)
 
         # # nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0, ...
         # self.conv_0 = nn.Conv2d(1, out_chs, kernel_size=kernel, padding=(2, 0))
@@ -48,7 +48,7 @@ class SomeNet(nn.Module):
 
     def forward(self, X):
         # x: (N, seq_len)
-        print(X.size())
+        # print(X.size())
 
         #Word embeddings
         embedded = self.word_embeddings(X)
@@ -58,8 +58,10 @@ class SomeNet(nn.Module):
         batch_size = X.size(0)
 
         #Initial hidden state
-        h0 = Variable(torch.zeros(2*self.num_layers, batch_size, self.hidden_dim // 2))
-        c0 = Variable(torch.zeros(2*self.num_layers, batch_size, self.hidden_dim // 2))
+        h0 = Variable(torch.zeros(2*self.num_layers*5, batch_size, self.hidden_dim // 2)).cuda()
+        c0 = Variable(torch.zeros(2*self.num_layers*5, batch_size, self.hidden_dim // 2)).cuda()
+        
+        #print(h0.size(), c0.size())
 
         #Forward state
         output, (hidden_state, cell_state) = self.lstm(embedded, (h0, c0))
