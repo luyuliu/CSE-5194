@@ -18,8 +18,8 @@ def read_words(data_dir, seq_len, filter_h):
                     words.extend((['<pad>']*int(filter_h/2)) + ['<s>'] + tokens + ['</s>'])
             # print(line)
         count += 1
-        if count == 1:
-            break
+        # if count == 1:
+        #     break
 
     return words
 
