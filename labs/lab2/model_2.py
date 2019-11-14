@@ -23,7 +23,7 @@ class SomeNet(nn.Module):
         self.res_block_count = res_block_count
         # self.embd_size = embd_size
 
-        self.embedding = nn.Embedding(vocab_size, embd_size)
+        self.word_embeddings = nn.Embedding(vocab_size, embd_size)
         
         self.dropout = 0.5
         self.hidden_dim = 128
