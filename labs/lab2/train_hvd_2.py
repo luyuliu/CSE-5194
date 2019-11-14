@@ -30,8 +30,8 @@ parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
                     help='input batch size for testing (default: 1000)')
 parser.add_argument('--epochs', type=int, default=1, metavar='N',
                     help='number of epochs to train (default: 1)')
-parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
-                    help='learning rate (default: 0.01)')
+parser.add_argument('--lr', type=float, default=3e-3, metavar='LR',
+                    help='learning rate (default: 3e-3)')
 parser.add_argument('--momentum', type=float, default=0.5, metavar='M',
                     help='SGD momentum (default: 0.5)')
 parser.add_argument('--no-cuda', action='store_true', default=False,
@@ -118,8 +118,7 @@ if args.cuda:
     model.cuda()
 
 # Horovod: scale learning rate by the number of GPUs.
-optimizer = optim.SGD(model.parameters(), lr=args.lr * hvd.size(),
-                      momentum=args.momentum)
+optimizer = optim.Adam(model.parameters(), lr=args.lr * hvd.size())
 
 # Horovod: broadcast parameters & optimizer state.
 hvd.broadcast_parameters(model.state_dict(), root_rank=0)
@@ -154,7 +153,7 @@ def train(epoch):
         if args.cuda:
             data, target = data.cuda(), target.cuda()
         output = model(data)
-        loss = F.nll_loss(output, target)
+        loss = F.cross_entropy(output, target)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
