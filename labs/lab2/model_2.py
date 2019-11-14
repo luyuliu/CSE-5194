@@ -61,7 +61,7 @@ class SomeNet(nn.Module):
         c0 = Variable(torch.zeros(2*self.num_layers, batch_size, self.hidden_dim // 2))
 
         #Forward state
-        output, (hidden_state, cell_state) = self.lstm(embedded, (h0, c0))
+        output = self.lstm(embedded, (h0, c0))
 
         x = self.output(output[-1])
 
