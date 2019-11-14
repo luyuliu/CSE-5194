@@ -45,7 +45,19 @@ class SomeNet(nn.Module):
         # self.c = nn.ParameterList([nn.Parameter(torch.randn(1, out_chs, 1, 1)) for _ in range(n_layers)])
 
         # self.fc = nn.Linear(out_chs*seq_len, ans_size)
+    def attention(self, out, state):
 
+        """
+        Use attention to compute soft alignment score between each hidden state and the last hidden state (torch.bmm: batch matrix multiplication)
+        """
+
+        hidden = state.squeeze(0)
+        attn_weights = torch.bmm(out, hidden.unsqueeze(2)).squeeze(2)
+        soft_attn_weights = F.softmax(attn_weights, 1)
+        new_hidden = torch.bmm(out.transpose(1, 2), soft_attn_weights.unsqueeze(2)).squeeze(2)
+
+        return new_hidden
+        
     def forward(self, X):
         # x: (N, seq_len)
         # print(X.size())
