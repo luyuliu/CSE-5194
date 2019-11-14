@@ -57,12 +57,8 @@ class SomeNet(nn.Module):
         batch_size = X.size(0)
 
         #Initial hidden state
-        if(self.bidirectional):
-            h0 = Variable(torch.zeros(2*self.num_layers, batch_size, self.hidden_dim // 2))
-            c0 = Variable(torch.zeros(2*self.num_layers, batch_size, self.hidden_dim // 2))
-        else:
-            h0 = Variable(torch.zeros(self.num_layers, batch_size, self.hidden_dim))
-            c0 = Variable(torch.zeros(self.num_layers, batch_size, self.hidden_dim))
+        h0 = Variable(torch.zeros(2*self.num_layers, batch_size, self.hidden_dim // 2))
+        c0 = Variable(torch.zeros(2*self.num_layers, batch_size, self.hidden_dim // 2))
 
         #Forward state
         output, (hidden_state, cell_state) = self.lstm(embedded, (h0, c0))
