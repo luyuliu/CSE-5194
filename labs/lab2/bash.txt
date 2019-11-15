@@ -8,10 +8,12 @@ conda activate pytorch27
 module load cuda/10.0.130
 module load mvapich2/2.3.1-gpu
 cd CSE-5194/labs/lab2
+mpiexec -ppn 1 -binding none -env  NCCL_DEBUG=INFO python train_hvd_2.py
+
+
 mpiexec -ppn 1 -binding none -env  NCCL_DEBUG=INFO python train_lm.py --mlm --do_train --overwrite_output_dir
 
 
-mpiexec -ppn 1 -binding none -env  NCCL_DEBUG=INFO python train_hvd.py
 
 
 horovodrun -np 4 -H server1:1,server2:1,server3:1,server4:1 python train_hvd.py
