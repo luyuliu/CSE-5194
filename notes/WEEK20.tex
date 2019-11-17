@@ -1,0 +1,57 @@
+\documentclass[12pt]{article}
+\begin{document}
+\author{Luyu Liu}
+
+\newcounter{para}
+\newcommand\para{\par\refstepcounter{para}\thepara\space}
+
+\section*{CSE 5194 WEEK18}
+\title{CSE 5194 WEEK18}
+
+\section{squezze net}
+DNNs
+
+alexnet level but have 50x fewer parameters.
+
+vggnet use 3*3 filter to reduce parameters
+
+few parameters:
+
+FPGA: Field Programmable Gate Arrays
+
+\paragraph{model compression}
+
+network pruning: remove very small value to 0
+
+8bit/16bit
+
+hufffman encoding
+
+\paragraph{Goal}
+ahieve same accuracy with fewer parameters
+
+\paragraph{approach}
+it replace Some 3*3 filter with 1*1
+not all
+
+it's stride taht decide the size of the input map, not the size of the filter..
+
+SO it doesn't have a fc layers. It jsut used a avgpool layer.
+
+
+\section{Squeezenext}
+
+Condider hardware
+
+\paragraph{weight stationary}
+PE: processing element
+basically spatial parallelism
+
+
+
+\paragraph{output stationary}
+
+
+
+
+\end{document}
