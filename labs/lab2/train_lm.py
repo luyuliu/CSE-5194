@@ -30,6 +30,7 @@ import random
 import re
 import shutil
 import time
+from io import open
 
 import numpy as np
 import torch
@@ -187,7 +188,7 @@ def train(args, train_dataset, model, tokenizer):
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
     # kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
     
-    train_sampler = RandomSampler(train_dataset) if args.local_rank == -1 else DistributedSampler(train_dataset)
+    train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, num_replicas=hvd.size(), rank=hvd.rank())
     train_dataloader = DataLoader(train_dataset, sampler=train_sampler, batch_size=args.train_batch_size, num_workers = 1, pin_memory = True)
 
     if args.max_steps > 0:
@@ -249,7 +250,7 @@ def train(args, train_dataset, model, tokenizer):
     logger.info("  Num Epochs = %d", args.num_train_epochs)
     logger.info("  Instantaneous batch size per GPU = %d", args.per_gpu_train_batch_size)
     logger.info("  Total train batch size (w. parallel, distributed & accumulation) = %d",
-                   args.train_batch_size * args.gradient_accumulation_steps * (torch.distributed.get_world_size() if args.local_rank != -1 else 1))
+                   args.train_batch_size * args.gradient_accumulation_steps * (hvd.size() if args.local_rank != -1 else 1))
     logger.info("  Gradient Accumulation steps = %d", args.gradient_accumulation_steps)
     logger.info("  Total optimization steps = %d", t_total)
 
@@ -267,6 +268,7 @@ def train(args, train_dataset, model, tokenizer):
         for step, batch in enumerate(train_dataloader):
             a = time.time()
             inputs, labels = mask_tokens(batch, tokenizer, args) if args.mlm else (batch, batch)
+            inputs, labels = inputs.cuda(), labels.cuda()
             # inputs = inputs.to(args.device)
             # labels = labels.to(args.device)
             model.train()
@@ -484,13 +486,13 @@ def main():
     args.cuda = not args.no_cuda and torch.cuda.is_available()
     hvd.init()
     torch.manual_seed(args.seed)
-    torch.set_num_threads(1)
     if args.cuda:
         # Horovod: pin GPU to local rank.
         torch.cuda.set_device(hvd.local_rank())
         torch.cuda.manual_seed(args.seed)
     args.n_gpu = 1
 
+    torch.set_num_threads(1)
 
     if args.model_type in ["bert", "roberta", "distilbert"] and not args.mlm:
         raise ValueError("BERT and RoBERTa do not have LM heads but masked LM heads. They must be run using the --mlm "
@@ -539,7 +541,7 @@ def main():
     #                 args.local_rank, device, args.n_gpu, bool(args.local_rank != -1), args.fp16)
 
     # Set seed
-    set_seed(args)
+    # set_seed(args)
 
     # Load pretrained model and tokenizer
     # if args.local_rank not in [-1, 0]:
@@ -575,6 +577,8 @@ def main():
 
         # if args.local_rank == 0:
         #     torch.distributed.barrier()
+
+        print("Training")
 
         global_step, tr_loss = train(args, train_dataset, model, tokenizer)
         logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
