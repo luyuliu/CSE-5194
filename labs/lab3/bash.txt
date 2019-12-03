@@ -1,14 +1,14 @@
-qsub -I -l nodes=2:ppn=1:gpus=1 -l walltime=2:00:00 -A PAS1588
+qsub -I -l nodes=2:ppn=1:gpus=1 -l walltime=0:20:00 -A PAS1588
 
-qsub -I -l nodes=2:ppn=28 -l walltime=2:00:00 -A PAS1588
+qsub -I -l nodes=2:ppn=28 -l walltime=0:20:00 -A PAS1588
 
 source /users/PAS1588/liuluyu0378/example/miniconda/bin/activate
 export PYTHONNOUSERSITE=true
 conda activate pytorch27
 module load cuda/10.0.130
 module load mvapich2/2.3.1-gpu
-cd CSE-5194/labs/lab2
-mpiexec -ppn 1 -binding none -env  NCCL_DEBUG=INFO python train_hvd_2.py
+cd CSE-5194/labs/lab3
+mpiexec -ppn 1 -binding none -env  NCCL_DEBUG=INFO python train_hvd_1.py --batch-size 64
 
 
 mpiexec -ppn 1 -binding none -env  NCCL_DEBUG=INFO python train_lm.py --mlm --do_train --overwrite_output_dir

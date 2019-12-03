@@ -30,7 +30,7 @@ parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
                     help='input batch size for testing (default: 1000)')
 parser.add_argument('--epochs', type=int, default=1, metavar='N',
                     help='number of epochs to train (default: 1)')
-parser.add_argument('--lr', type=float, default=3e-3, metavar='LR',
+parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
                     help='learning rate (default: 3e-3)')
 parser.add_argument('--momentum', type=float, default=0.5, metavar='M',
                     help='SGD momentum (default: 0.5)')
@@ -123,9 +123,10 @@ optimizer = optim.Adam(model.parameters(), lr=args.lr * hvd.size())
 
 total_comm_time = time.time()
 # Horovod: broadcast parameters & optimizer state.
+adf = time.time()
 hvd.broadcast_parameters(model.state_dict(), root_rank=0)
 hvd.broadcast_optimizer_state(optimizer, root_rank=0)
-
+bdf = time.time()
 # Horovod: (optional) compression algorithm.
 compression = hvd.Compression.fp16 if args.fp16_allreduce else hvd.Compression.none
 
@@ -246,4 +247,7 @@ total_comm_time += total_training_comm_time
 print("************* Total train time: ", total_training_time, "***************")
 print("************* Total training minus comm time: ", training_minus_epoch_comm_time, "***************")
 print("************* Total comm time: ", total_comm_time, "***************")
+print("************* Broadcast time: ", bdf - adf, "***************")
+print("************* allinall time: ", total_training_comm_time, "***************")
+
 test()
