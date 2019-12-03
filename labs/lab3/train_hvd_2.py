@@ -20,7 +20,7 @@ from torch.utils.data import DistributedSampler, DataLoader
 from torch.nn.parallel import DistributedDataParallelCPU, DistributedDataParallel, DataParallel
 import torch.multiprocessing as mp
 import torch.distributed as dist
-from gated_cnn import GatedCNN
+from model_2 import SomeNet
 
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
@@ -30,8 +30,8 @@ parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
                     help='input batch size for testing (default: 1000)')
 parser.add_argument('--epochs', type=int, default=1, metavar='N',
                     help='number of epochs to train (default: 1)')
-parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
-                    help='learning rate (default: 0.01)')
+parser.add_argument('--lr', type=float, default=3e-3, metavar='LR',
+                    help='learning rate (default: 3e-3)')
 parser.add_argument('--momentum', type=float, default=0.5, metavar='M',
                     help='SGD momentum (default: 0.5)')
 parser.add_argument('--no-cuda', action='store_true', default=False,
@@ -58,7 +58,6 @@ rank            = 0
 world_size      = 2
 
 # Horovod: initialize library.
-
 hvd.init()
 torch.manual_seed(args.seed)
 
@@ -112,15 +111,14 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.test_bat
                                           sampler=test_sampler, **kwargs)
 
 
-model = GatedCNN(seq_len, vocab_size, embd_size, n_layers, kernel, out_chs, res_block_count, vocab_size)
+model = SomeNet(seq_len, vocab_size, embd_size, n_layers, kernel, out_chs, res_block_count, vocab_size)
 
 if args.cuda:
     # Move model to GPU.
     model.cuda()
 
 # Horovod: scale learning rate by the number of GPUs.
-optimizer = optim.SGD(model.parameters(), lr=args.lr * hvd.size(),
-                      momentum=args.momentum)
+optimizer = optim.Adam(model.parameters(), lr=args.lr * hvd.size())
 
 # Horovod: broadcast parameters & optimizer state.
 hvd.broadcast_parameters(model.state_dict(), root_rank=0)
@@ -136,15 +134,9 @@ optimizer = hvd.DistributedOptimizer(optimizer,
 
 
 def train(epoch):
-    a = time.time()
     model.train()
-    b = time.time()
-    print("train: ", b -a )
-    a = time.time()
     # Horovod: set epoch to sampler for shuffling.
     train_sampler.set_epoch(epoch)
-    b = time.time()
-    print("set_epoch: ", b -a )
     for batch_idx, (data, target) in enumerate(train_dataset):
         a = time.time()
         # for i in range(len(data)):
@@ -161,7 +153,7 @@ def train(epoch):
         if args.cuda:
             data, target = data.cuda(), target.cuda()
         output = model(data)
-        loss = F.nll_loss(output, target)
+        loss = F.cross_entropy(output, target)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
