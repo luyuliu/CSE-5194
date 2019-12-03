@@ -72,7 +72,7 @@ torch.set_num_threads(1)
 
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
 
-words = read_words('/users/PAS1588/liuluyu0378/lab3/CSE-5194/labs/lab2/1-billion-word-language-modeling-benchmark-r13output/training-monolingual.tokenized.shuffled', seq_len, kernel[0])
+words = read_words('/users/PAS1588/liuluyu0378/lab1/1-billion-word-language-modeling-benchmark-r13output/training-monolingual.tokenized.shuffled', seq_len, kernel[0])
 word_counter = collections.Counter(words).most_common(vocab_size-1)
 vocab = [w for w, _ in word_counter]
 w2i = dict((w, i) for i, w in enumerate(vocab, 1))
