@@ -20,7 +20,7 @@ from torch.utils.data import DistributedSampler, DataLoader
 from torch.nn.parallel import DistributedDataParallelCPU, DistributedDataParallel, DataParallel
 import torch.multiprocessing as mp
 import torch.distributed as dist
-from some_net import SomeNet
+from model_2 import SomeNet
 
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
