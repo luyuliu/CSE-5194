@@ -38,19 +38,12 @@ class GatedCNN(nn.Module):
         self.fc = nn.Linear(out_chs*seq_len, ans_size)
 
     def forward(self, x):
-        # x: (N, seq_len)
-
         # Embedding
         bs = x.size(0) # batch size
         seq_len = x.size(1)
         x = self.embedding(x) # (bs, seq_len, embd_size)
-
         # CNN
         x = x.unsqueeze(1) # (bs, Cin, seq_len, embd_size), insert Channnel-In dim
-        # print(x.size())
-        # Conv2d
-        #    Input : (bs, Cin,  Hin,  Win )
-        #    Output: (bs, Cout, Hout, Wout)
         A = self.conv_0(x)      # (bs, Cout, seq_len, 1)
         A += self.b_0.repeat(1, 1, seq_len, 1)
         B = self.conv_gate_0(x) # (bs, Cout, seq_len, 1)
