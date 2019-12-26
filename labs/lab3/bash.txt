@@ -1,0 +1,56 @@
+qsub -I -l nodes=2:ppn=1:gpus=1 -l walltime=0:20:00 -A PAS1588
+
+qsub -I -l nodes=2:ppn=28 -l walltime=0:20:00 -A PAS1588
+
+source /users/PAS1588/liuluyu0378/example/miniconda/bin/activate
+export PYTHONNOUSERSITE=true
+conda activate pytorch27
+module load cuda/10.0.130
+module load mvapich2/2.3.1-gpu
+cd CSE-5194/labs/lab3
+mpiexec -ppn 1 -binding none -env  NCCL_DEBUG=INFO python train_hvd_1.py --batch-size 64
+
+
+mpiexec -ppn 1 -binding none -env  NCCL_DEBUG=INFO python train_lm.py --mlm --do_train --overwrite_output_dir
+
+
+
+
+horovodrun -np 4 -H server1:1,server2:1,server3:1,server4:1 python train_hvd.py
+
+mpirun -np 4 -H p0247:1,p0246:1,p0248:1,p0241:1 python train_hvd.py
+
+mpiexec -ppn 1 -binding none -env  NCCL_DEBUG=INFO python train_hvd.py
+
+mpirun -np 2 -H p0247:1,p0253:1 python train_hvd.py 
+--prefix ~/example/miniconda/envs/pytorch3 
+
+
+module list
+module load mvapich2/2.3.1-gpu
+module list
+vi .bashrc
+ls
+cd example/
+ls
+source miniconda/bin/activate
+which conda
+conda create -n test_pytorch python=2.7.15
+conda activate test_pytorch
+export PYTHONNOUSERSITE=true
+pip3 install torch torchvision
+pip install torch torchvision
+pip install --no-cache-dir horovod==0.16.4
+conda deactivate
+conda create -n pytorch3 python=3.6.5
+conda activate pytorch2
+conda activate pytorch3
+pip install torch torchvision
+pip install --no-cache-dir horovod==0.16.4
+module avail
+vi ~/.bashrc
+conda deactivate
+conda deactivate
+source miniconda/bin/activate
+conda activate pytorch3
+conda env list

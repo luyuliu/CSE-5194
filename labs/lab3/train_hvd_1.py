@@ -20,7 +20,7 @@ from torch.utils.data import DistributedSampler, DataLoader
 from torch.nn.parallel import DistributedDataParallelCPU, DistributedDataParallel, DataParallel
 import torch.multiprocessing as mp
 import torch.distributed as dist
-from gated_cnn import GatedCNN
+from model_2 import SomeNet
 
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
@@ -31,7 +31,7 @@ parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
 parser.add_argument('--epochs', type=int, default=1, metavar='N',
                     help='number of epochs to train (default: 1)')
 parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
-                    help='learning rate (default: 0.01)')
+                    help='learning rate (default: 3e-3)')
 parser.add_argument('--momentum', type=float, default=0.5, metavar='M',
                     help='SGD momentum (default: 0.5)')
 parser.add_argument('--no-cuda', action='store_true', default=False,
@@ -53,12 +53,11 @@ n_layers        = 10
 kernel          = (5, embd_size)
 out_chs         = 64
 res_block_count = 5
-batch_size      = 80
+batch_size      = args.batch_size
 rank            = 0
 world_size      = 2
 
 # Horovod: initialize library.
-
 hvd.init()
 torch.manual_seed(args.seed)
 
@@ -102,7 +101,7 @@ train_dataset = training_data
 train_sampler = torch.utils.data.distributed.DistributedSampler(
     train_dataset, num_replicas=hvd.size(), rank=hvd.rank())
 train_loader = torch.utils.data.DataLoader(
-    train_dataset, batch_size=args.batch_size, sampler=train_sampler, **kwargs)
+    train_dataset, batch_size=80, sampler=train_sampler, **kwargs)
 
 test_dataset = test_data
 # Horovod: use DistributedSampler to partition the test data.
@@ -114,18 +113,20 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.test_bat
 
 model = GatedCNN(seq_len, vocab_size, embd_size, n_layers, kernel, out_chs, res_block_count, vocab_size)
 
+
 if args.cuda:
     # Move model to GPU.
     model.cuda()
 
 # Horovod: scale learning rate by the number of GPUs.
-optimizer = optim.SGD(model.parameters(), lr=args.lr * hvd.size(),
-                      momentum=args.momentum)
+optimizer = optim.Adam(model.parameters(), lr=args.lr * hvd.size())
 
+total_comm_time = time.time()
 # Horovod: broadcast parameters & optimizer state.
+adf = time.time()
 hvd.broadcast_parameters(model.state_dict(), root_rank=0)
 hvd.broadcast_optimizer_state(optimizer, root_rank=0)
-
+bdf = time.time()
 # Horovod: (optional) compression algorithm.
 compression = hvd.Compression.fp16 if args.fp16_allreduce else hvd.Compression.none
 
@@ -134,17 +135,18 @@ optimizer = hvd.DistributedOptimizer(optimizer,
                                      named_parameters=model.named_parameters(),
                                      compression=compression)
 
+total_comm_time = time.time() - total_comm_time
+
+total_training_comm_time = 0
 
 def train(epoch):
-    a = time.time()
+    start = 0
+    end = 0
+    epoch_comm_time = 0
+
     model.train()
-    b = time.time()
-    print("train: ", b -a )
-    a = time.time()
     # Horovod: set epoch to sampler for shuffling.
     train_sampler.set_epoch(epoch)
-    b = time.time()
-    print("set_epoch: ", b -a )
     for batch_idx, (data, target) in enumerate(train_dataset):
         a = time.time()
         # for i in range(len(data)):
@@ -157,14 +159,24 @@ def train(epoch):
         
         data = to_var(torch.LongTensor(data)) # (bs, seq_len)
         target = to_var(torch.LongTensor(target)) # (bs,)
-        # print( data.size(), target.size())
         if args.cuda:
             data, target = data.cuda(), target.cuda()
         output = model(data)
-        loss = F.nll_loss(output, target)
+        loss = F.cross_entropy(output, target)
+
+        start = time.time()
         optimizer.zero_grad()
+        end = time.time()
+        epoch_comm_time = end - start + epoch_comm_time
+
         loss.backward()
+
+        start = time.time()
         optimizer.step()
+        end = time.time()
+        epoch_comm_time = end - start + epoch_comm_time
+
+
         b = time.time()
         if batch_idx % args.log_interval == 0:
             # Horovod: use train_sampler to determine the number of examples in
@@ -174,7 +186,8 @@ def train(epoch):
                     epoch, batch_idx * len(data), len(train_dataset),
                     100. * batch_idx / len(train_dataset), loss.item()))
                 print("Train time: ", b -a)
-    
+
+    return epoch_comm_time     
 
 
 def metric_average(val, name):
@@ -224,9 +237,17 @@ def test():
             test_loss, 100. * test_accuracy))
 
 
+aa = time.time()
 for epoch in range(1, args.epochs + 1):
-    aa = time.time()
-    train(epoch)
-    bb = time.time()
-    print("************* Total train time: ", bb - aa, "***************")
-    test()
+    total_training_comm_time += train(epoch)
+bb = time.time()
+total_training_time = bb - aa
+training_minus_epoch_comm_time = total_training_time - total_training_comm_time
+total_comm_time += total_training_comm_time
+print("************* Total train time: ", total_training_time, "***************")
+print("************* Total training minus comm time: ", training_minus_epoch_comm_time, "***************")
+print("************* Total comm time: ", total_comm_time, "***************")
+print("************* Broadcast time: ", bdf - adf, "***************")
+print("************* allinall time: ", total_training_comm_time, "***************")
+
+test()
